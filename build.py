@@ -18,4 +18,7 @@ doc = [line1, rd('00_head.html'), '<script>', *[rd(n) for n in vendor], '</scrip
 page = '\n'.join(doc)
 os.makedirs(os.path.join(here, 'out'), exist_ok=True)
 open(os.path.join(here, 'out', 'index.html'), 'w', encoding='utf8').write(page)
+import shutil
+if os.path.isdir(os.path.join(here, 'music')):   # the songs go beside the page
+    shutil.copytree(os.path.join(here, 'music'), os.path.join(here, 'out', 'music'), dirs_exist_ok=True)
 print('built out/index.html', len(page.encode('utf8')), 'bytes', hashlib.md5(page.encode('utf8')).hexdigest()[:8])

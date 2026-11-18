@@ -7823,42 +7823,69 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
     var s = C.createBufferSource(); s.buffer = b; var f = C.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = freq; var g = C.createGain(); g.gain.value = vol;
     s.connect(f); f.connect(g); g.connect(AU.master); s.start();
   }
-  // ---------------------------------------------------------------- music: songs in files beside the page (music/*.mp3, see MUSIC);
-  // one for the title, the day, the evening, the night, the storm and the ending. Two decks crossfade between songs, and round again
-  // when a song ends, so none needs to loop cleanly. The music drops under the reading voice, and is quieter in Easy to see.
+  // ---------------------------------------------------------------- music: songs in files beside the page (music/*.mp3, see MUSIC and SETS).
+  // The music is a guest here, not the host (Nov 18): the valley's own sounds and the reading voice come first.
+  //   - A song plays once, right through, and then the valley is left to itself for a few minutes before the next one.
+  //   - Each part of the day has its own short list (SETS). The two main songs take turns through the day.
+  //   - It is kept low, drops right down under the reading voice, and stays out of the storm altogether.
   // A song that is missing is simply not played: the game is complete without any.
-  var MUSIC = { title: 'music/title.mp3', day: 'music/day.mp3', evening: 'music/evening.mp3', night: 'music/night.mp3', storm: 'music/storm.mp3', ending: 'music/ending.mp3' };
-  var MUS = { decks: [], cur: null, want: null, bad: {}, level: 0, duck: 1, fade: 2.8 };
+  var MUSIC = { pixel: 'music/pastoral-pixel.mp3', unhurried: 'music/unhurried-exploration.mp3', golden: 'music/golden-hour.mp3', quiet: 'music/pastoral-quiet.mp3' };
+  var SETS = { title: ['pixel'], day: ['unhurried', 'pixel'], evening: ['golden'], night: ['quiet'], storm: [], ending: ['golden'] };
+  // how long the valley is left to itself after a song, in seconds: [least, most]
+  var RESTS = { title: [14, 20], day: [150, 270], evening: [130, 240], night: [130, 240], ending: [1e9, 1e9], storm: [1e9, 1e9] };
+  var MUS = { decks: [], cur: null, scene: null, idx: {}, rest: 1, bad: {}, level: 0, duck: 1, fade: 2.8, played: 0, direct: location.protocol === 'file:' };
   function musicDeck() {
     var a = new Audio(); a.preload = 'auto';
     var d = { a: a, g: null, name: null, vol: 0, goal: 0 };
-    a.addEventListener('error', function () { if (d.name) MUS.bad[d.name] = true; d.goal = 0; });
-    try { var src = AU.ctx.createMediaElementSource(a); d.g = AU.ctx.createGain(); d.g.gain.value = 0; src.connect(d.g); d.g.connect(AU.master); } catch (e) { d.g = null; }
+    a.addEventListener('error', function () { if (d.name) MUS.bad[d.name] = true; d.goal = 0; d.vol = 0; if (MUS.cur === d.name) { MUS.cur = null; MUS.rest = 2; } });
+    a.addEventListener('ended', function () { if (d.goal > 0) musicOver(d); });
+    // opened straight from a folder the browser will not pass a file through the mixer, so there the player's own volume is used instead
+    if (!MUS.direct) { try { var src = AU.ctx.createMediaElementSource(a); d.g = AU.ctx.createGain(); d.g.gain.value = 0; src.connect(d.g); d.g.connect(AU.master); } catch (e) { d.g = null; } }
     MUS.decks.push(d); return d;
   }
-  function musicWant() {
+  function musicScene() {
     if (TITLE.on || !playing && !WATCH.on) return 'title';
     if (ENDING.on || modal === 'endVeil' || modal === 'creditsVeil') return 'ending';
-    if (save.weather === 'storm' && !MUS.bad.storm) return 'storm';
+    if (save.weather === 'storm') return 'storm';
     var h = ((SKY.hour % 24) + 24) % 24; return h >= 5.4 && h < 16.6 ? 'day' : h >= 16.6 && h < 20.6 ? 'evening' : 'night';
   }
+  function musicOver(d) {   // a song has played right through: now the valley has the floor for a while
+    d.goal = 0; d.vol = 0; if (MUS.cur === d.name) MUS.cur = null;
+    var r = RESTS[MUS.scene] || [150, 270]; MUS.rest = r[0] + Math.random() * (r[1] - r[0]);
+  }
+  function musicStop(fade) { MUS.decks.forEach(function (d) { if (d.goal > 0) { d.goal = 0; d.out = fade || MUS.fade; } }); MUS.cur = null; }
   function musicPlay(name) {
-    if (!AU.ctx || MUS.bad[name] || !MUSIC[name]) return;
+    if (!AU.ctx || MUS.bad[name] || !MUSIC[name]) return false;
     while (MUS.decks.length < 2) musicDeck();
-    var d = MUS.decks[0].goal > 0 ? MUS.decks[1] : MUS.decks[0], o = d === MUS.decks[0] ? MUS.decks[1] : MUS.decks[0];
-    o.goal = 0; d.name = name; d.goal = 1; d.a.src = MUSIC[name]; d.a.currentTime = 0; var p = d.a.play(); if (p && p.catch) p.catch(function () {});
-    MUS.cur = name;
+    var d = MUS.decks[0].goal > 0 || MUS.decks[0].vol > 0.02 ? MUS.decks[1] : MUS.decks[0], o = d === MUS.decks[0] ? MUS.decks[1] : MUS.decks[0];
+    o.goal = 0; d.name = name; d.goal = 1; d.vol = 0; d.a.src = MUSIC[name]; try { d.a.currentTime = 0; } catch (e) {} var p = d.a.play(); if (p && p.catch) p.catch(function () {});
+    MUS.cur = name; MUS.played++; return true;
+  }
+  function musicNext(scene) {   // the next song on this part of the day's list, taking turns
+    var set = (SETS[scene] || []).filter(function (n) { return !MUS.bad[n] && MUSIC[n]; }); if (!set.length) return false;
+    var i = MUS.idx[scene] || 0; MUS.idx[scene] = i + 1; return musicPlay(set[i % set.length]);
   }
   function musicUpdate(dt) {
     if (!AU.ctx) return;
-    var lvl = save.music === 'off' || !save.sound ? 0 : (save.music === 'quiet' || EASY.on ? 0.45 : 0.8);
-    MUS.duck += ((speechBusy() ? 0.3 : 1) - MUS.duck) * Math.min(1, dt * 2.5);
-    var w = musicWant(); if (lvl > 0 && w !== MUS.cur && !MUS.bad[w]) musicPlay(w);
+    var lvl = save.music === 'off' || !save.sound ? 0 : (save.music === 'quiet' || EASY.on ? 0.26 : 0.5);
+    MUS.level = lvl; MUS.duck += ((speechBusy() ? 0.18 : 1) - MUS.duck) * Math.min(1, dt * 2.5);
+    var sc = musicScene();
+    if (sc !== MUS.scene) {
+      var was = MUS.scene; MUS.scene = sc;
+      var fits = MUS.cur && (SETS[sc] || []).indexOf(MUS.cur) >= 0 && sc !== 'title' && sc !== 'ending';
+      if (!fits) {
+        if (MUS.cur) musicStop(sc === 'storm' ? 4 : sc === 'ending' ? 3 : was === 'title' ? 3.5 : 6);
+        // the title and the ending have their song straight away; coming in from the title, or into a new part of the day, the valley is heard first
+        MUS.rest = sc === 'title' ? 0.6 : sc === 'ending' ? 2.5 : sc === 'storm' ? 1e9 : was === 'title' ? 22 : was === 'ending' ? 40 : was === 'storm' ? 45 : 9;
+      }
+    }
+    if (lvl <= 0) { if (MUS.cur) musicStop(1.5); }
+    else if (!MUS.cur) { MUS.rest -= dt; if (MUS.rest <= 0) { if (!musicNext(sc)) MUS.rest = 30; } }
     MUS.decks.forEach(function (d) {
-      // round again: a song nearing its end hands over to the other deck, from the top
-      if (d.goal > 0 && d.a.duration && d.a.currentTime > d.a.duration - MUS.fade - 0.2) { d.goal = 0; var keep = d.name; MUS.cur = null; musicPlay(keep); }
-      d.vol += Math.max(-dt / MUS.fade, Math.min(dt / MUS.fade, d.goal - d.vol));
-      if (d.g) d.g.gain.value = d.vol * lvl * MUS.duck * 0.5;
+      var rate = d.goal > 0 ? MUS.fade : (d.out || MUS.fade);
+      d.vol += Math.max(-dt / rate, Math.min(dt / rate, d.goal - d.vol));
+      var gain = d.vol * lvl * MUS.duck * 0.5;
+      if (d.g) d.g.gain.value = gain; else { try { d.a.volume = Math.max(0, Math.min(1, gain)); } catch (e) {} }
       if (d.vol <= 0.001 && d.goal === 0 && !d.a.paused) d.a.pause();
     });
   }
@@ -9943,7 +9970,7 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
     step: function (sec, fps) { var h = 1 / (fps || 30); for (var t = 0; t < sec - 1e-6; t += h) update(h); render(); },
     tick: function (sec, fps) { var h = 1 / (fps || 30); for (var t = 0; t < sec - 1e-6; t += h) update(h); },
     render: render, openMap: openMap, reveal: reveal, blocked: blocked, sky: SKY, rest: function (seatId, target) { restSeat = SEATS.filter(function (q) { return q.id === seatId; })[0] || { x: P.x, z: P.z, y: P.y, face: P.yaw, label: 'here' }; rest(target); }, seats: SEATS, startStorm: function () { startStorm(); }, endStorm: function () { endStorm(); }, setHour: function (h) { SKY.hour = h; save.hour = h; }, openStudio: openStudio, journal: function () { journal(); openModal('journalVeil'); }, icon: icon, findObj: findObj, available: available, pickUp: pickUp, setWave: function (w) { save.wave = w; showFinds(); }, items: ITEMS,
-    closeUp: closeUp, tilt: tilt, resetView: resetView, skips: SKIPS, stone: STONE, skipStone: skipStone, nearSkip: nearSkip, noteSeen: noteSeen, field: FIELD, amb: AMB,
+    closeUp: closeUp, tilt: tilt, resetView: resetView, music: MUS, musicSets: SETS, musicScene: musicScene, skips: SKIPS, stone: STONE, skipStone: skipStone, nearSkip: nearSkip, noteSeen: noteSeen, field: FIELD, amb: AMB,
     ponder: ponder, say: say, voice: setVoice, PON: PON, easy: setEasy, EASY: EASY,
     watch: { start: watchStart, stop: watchStop, pause: watchPause, skip: watchSkip, state: WATCH, story: STORY },
     guide: { go: guideGo, stop: guideStop, plan: planRoute, next: nextGoal, state: GUIDE, nav: function () { if (!NAV) buildNav(); return NAV; }, lineOK: lineOK },
