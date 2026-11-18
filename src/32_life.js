@@ -1,5 +1,11 @@
      deer         white-tailed deer in the meadows at dusk and dawn; up go the white tails and away they bound
      cardinal     a red cardinal hopping about the trailhead, off into the bushes when he comes near
+     bats         at dusk they pour out of the cave and away down the creek; at night a few hunt over the water near him
+     armadillo    snuffling by the main trail in the evening and at night; it jumps straight up, then leaves
+     roadrunner   on the county road by day; off up the road when he comes near
+     bass         clears the water in the Blue Hole now and then
+     luna moth    keeps the lantern company at night
+     L.sight      what there is to see, for the field notes in his journal
    const L = PKValleyLife.create(world, scene);  L.update(t, dt, { x, z, wading });  L.events -> things that just happened */
 (function (global) {
   'use strict';
@@ -18,6 +24,11 @@
   PAINT.owl = ['#4a3828', '#6e5238', '#927050']; PAINT.owlL = ['#9a8466', '#bfa883', '#d8c4a0']; PAINT.owlE = ['#f0c040', '#ffd860', '#ffe890'];
   PAINT.deer = ['#6e4a2e', '#946a42', '#b08458']; PAINT.deerW = ['#d8d2c4', '#f0ece2', '#fbf9f4']; PAINT.card = ['#8a1a16', '#c42a20', '#e84a36'];
   ['vult', 'vultG', 'vultH', 'owl', 'owlL', 'owlE', 'deer', 'deerW', 'card'].forEach(function (k) { PAINT[k].forEach(W.note); });
+  // the upgrade pass: bats, an armadillo, a roadrunner, a bass, a luna moth
+  PAINT.bat = ['#1c1a1e', '#2a262c', '#3a343c']; PAINT.dillo = ['#6a6258', '#8c8478', '#aca496']; PAINT.dilloD = ['#4a443c', '#5e564c', '#746a5e'];
+  PAINT.rrun = ['#4a4034', '#6e604c', '#948468']; PAINT.rrunL = ['#b8ac94', '#d6ccb6', '#eae2d0']; PAINT.bass = ['#3e5a3a', '#5a7a4e', '#86a070']; PAINT.bassL = ['#b8c4a8', '#d8e0c8', '#eef2e2'];
+  PAINT.luna = ['#8ec49a', '#b4e0b4', '#d8f4d0'];
+  ['bat', 'dillo', 'dilloD', 'rrun', 'rrunL', 'bass', 'bassL', 'luna', 'white', 'leg'].forEach(function (k) { PAINT[k].forEach(W.note); });
   PAINT.duck = ['#6a4a30', '#8a6440', '#a88058']; PAINT.duckH = ['#3e4a5e', '#56667e', '#76869c']; PAINT.duckW = ['#cfd8de', '#eef2f4', '#fbfdfe']; PAINT.duckB = ['#5d8fb8', '#7aaed6', '#9ac8ea'];
   ['heron', 'heronW', 'heronK', 'beak', 'leg', 'shell', 'tskin', 'tstripe', 'frog', 'fish', 'dfly', 'dwing', 'bfly', 'bflyK', 'duck', 'duckH', 'duckW', 'duckB'].forEach(function (k) { PAINT[k].forEach(W.note); });
 
@@ -473,10 +484,183 @@
       card.g.rotation.x = card.hopT > 0.4 && Math.sin(t * 5) > 0.7 ? 0.5 : 0;   // a peck
     }
 
+    // ================================================================ more of the valley's life (the upgrade pass, Nov 18)
+    // ---------------- bats: at dusk they pour out of the cave under the bluff and away down the creek; at night a few hunt over the water near him
+    var BATS = (function () {
+      var N = 72, g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0.05, -0.17, 0, 0.02, -0.1, 0, -0.06, 0, 0, 0.05, -0.1, 0, -0.06, 0, 0, -0.03, 0, 0, 0.05, 0.1, 0, -0.06, 0.17, 0, 0.02, 0, 0, 0.05, 0, 0, -0.03, 0.1, 0, -0.06], 3)); g.computeVertexNormals();
+      var im = new THREE.InstancedMesh(g, W.paint('bat', { side: true }), N); im.frustumCulled = false; im.castShadow = false; im.receiveShadow = false; im.visible = false; im.name = 'Bats'; grp.add(im);
+      var marks = [0, 1, 2].map(function () { var q = new THREE.Object3D(); q.visible = false; grp.add(q); return q; }), mark = marks[0];
+      var c = S.cave || { x: 12, z: -25 }, y0 = world.height(c.x, c.z + 6);
+      var curve = new THREE.CatmullRomCurve3([[c.x, y0 + 1.1, c.z - 2.4], [c.x, y0 + 2.0, c.z + 1.5], [c.x + 2, y0 + 4.2, c.z + 9], [c.x + 10, y0 + 5.4, c.z + 17], [c.x + 24, y0 + 6, c.z + 23], [c.x + 44, y0 + 7, c.z + 29], [c.x + 68, y0 + 9, c.z + 34]].map(function (p) { return new THREE.Vector3(p[0], p[1], p[2]); }));
+      var d = []; for (var i = 0; i < N; i++) d.push({ off: R() * 9, sp: 0.85 + R() * 0.35, lane: (R() - 0.5) * 2, h: (R() - 0.5) * 2, ph: R() * 6.28 });
+      return { m: im, mark: mark, marks: marks, d: d, curve: curve, N: N, cave: c, told: false, o: new THREE.Object3D(), p: new THREE.Vector3(), q: new THREE.Vector3() };
+    })();
+    function batsUpdate(t, dt, k) {
+      var B = BATS, h = k.hour == null ? 12 : ((k.hour % 24) + 24) % 24, dusk = h > 18.2 && h < 20.6 && !k.storm && !k.ending, night = (h >= 20.6 || h < 5.2) && !k.storm && !k.ending, o = B.o, n = 0;
+      var dc = Math.hypot(B.cave.x - k.x, B.cave.z - k.z);
+      B.m.visible = (dusk && dc < 75) || night; B.marks.forEach(function (q) { q.visible = false; }); if (!B.m.visible) return;
+      if (dusk) {
+        // the stream: thick, then thin, then thick again, like smoke
+        var pulse = 0.55 + 0.45 * Math.sin(t * 0.21);
+        for (var i = 0; i < B.N; i++) {
+          var b = B.d[i], u = ((t * b.sp * 0.8 + b.off) % 9) / 7.5; if (u >= 1 || i > B.N * (0.7 + 0.3 * pulse)) continue;
+          B.curve.getPointAt(u, B.p); B.curve.getPointAt(Math.min(1, u + 0.01), B.q);
+          var yaw = Math.atan2(B.q.x - B.p.x, B.q.z - B.p.z), spread = 0.25 + 2.4 * u, wob = Math.sin(t * 5.1 + b.ph) * 0.35;
+          o.position.set(B.p.x + Math.cos(yaw) * (b.lane * spread + wob), B.p.y + b.h * (0.25 + 1.3 * u) + Math.sin(t * 6.3 + b.ph * 2) * 0.25, B.p.z - Math.sin(yaw) * (b.lane * spread + wob));
+          o.rotation.set(0, yaw, Math.sin(t * 7 + b.ph) * 0.5, 'YXZ'); o.scale.set(1.7 * (0.4 + 0.6 * Math.abs(Math.sin(t * 21 + b.ph))), 1.7, 1.7); o.updateMatrix(); B.m.setMatrixAt(n++, o.matrix);
+        }
+        B.marks.forEach(function (q, i) { B.curve.getPointAt([0.1, 0.24, 0.42][i], q.position); q.visible = n > 6; });
+        if (!B.told && dc < 16 && n > 6) { B.told = true; events.push({ type: 'bat' }); }
+      } else {
+        for (var j = 0; j < 5; j++) {
+          var c2 = B.d[j], a = t * (0.5 + 0.12 * j) * (j % 2 ? 1 : -1) + c2.ph, rr = 4.5 + 2.2 * Math.sin(t * 0.37 + c2.ph * 3);
+          var x = k.x + Math.cos(a) * rr + Math.sin(t * 2.3 + j) * 0.8, z = k.z + Math.sin(a) * rr * 0.8 + Math.cos(t * 1.9 + j * 2) * 0.8;
+          o.position.set(x, waterAt(x, z) + 2.6 + 0.9 * Math.sin(t * 1.3 + j * 1.7) + 0.4 * Math.sin(t * 4.7 + j), z);
+          o.rotation.set(0, -a + (j % 2 ? 0 : Math.PI), Math.sin(t * 6 + j) * 0.6, 'YXZ'); o.scale.set(1.6 * (0.4 + 0.6 * Math.abs(Math.sin(t * 21 + c2.ph))), 1.6, 1.6); o.updateMatrix(); B.m.setMatrixAt(n++, o.matrix);
+        }
+        B.mark.position.copy(o.position); B.mark.visible = true;
+      }
+      B.m.count = n; B.m.instanceMatrix.needsUpdate = true;
+    }
+    function dry(x, z) { return world.water(x, z) == null; }
+    function firstDry(list) { for (var i = 0; i < list.length; i++) if (dry(list[i][0], list[i][1])) return { x: list[i][0], z: list[i][1] }; return null; }
+    // ---------------- a nine-banded armadillo, snuffling along by the main trail in the evening and at night; it jumps straight up, then leaves
+    var DILLOAT = firstDry([[3, 11.5], [-21, 10], [20, 13], [-40, 10]]);
+    var dillo = (function () {
+      var g = new THREE.Group(); g.name = 'Armadillo';
+      var body = new THREE.Group(); g.add(body);
+      body.add(at(mesh(ell(0.13, 0.11, 0.2, 10), 'dillo'), 0, 0.14, 0));
+      for (var b = 0; b < 4; b++) body.add(at(mesh(new THREE.TorusGeometry(0.118 - Math.abs(b - 1.5) * 0.006, 0.012, 4, 10, Math.PI), 'dilloD'), 0, 0.135, -0.075 + b * 0.05));
+      var head = new THREE.Group(); head.position.set(0, 0.12, 0.19); body.add(head);
+      head.add(at(mesh(new THREE.ConeGeometry(0.05, 0.16, 6), 'dillo', true), 0, -0.01, 0.06, Math.PI / 2 + 0.25, 0, 0));
+      [-1, 1].forEach(function (s) { head.add(at(mesh(ell(0.016, 0.04, 0.012, 5), 'dilloD'), s * 0.035, 0.055, -0.01, 0, 0, -s * 0.3)); });
+      var tail = at(mesh(new THREE.ConeGeometry(0.03, 0.26, 5), 'dilloD', true), 0, 0.09, -0.3, -Math.PI / 2 - 0.25, 0, 0); body.add(tail);
+      var legs = [[-0.07, 0.11], [0.07, 0.11], [-0.07, -0.1], [0.07, -0.1]].map(function (q) { var l = at(mesh(new THREE.BoxGeometry(0.035, 0.09, 0.04), 'dilloD'), q[0], 0.045, q[1]); g.add(l); return l; });
+      g.scale.setScalar(1.45); g.traverse(function (o) { if (o.isMesh) o.castShadow = true; }); g.visible = false; grp.add(g);
+      return { g: g, body: body, head: head, legs: legs, x: DILLOAT ? DILLOAT.x : 0, z: DILLOAT ? DILLOAT.z : 0, yaw: R() * 6.28, turnT: 2, pause: 0, jump: -1, flee: 0, told: false };
+    })();
+    function dilloUpdate(t, dt, k) {
+      var a = dillo; if (!DILLOAT) return; var h = k.hour == null ? 12 : ((k.hour % 24) + 24) % 24, on = (h > 18.2 || h < 6.2) && !k.storm;
+      a.g.visible = on && Math.hypot(a.x - k.x, a.z - k.z) < 60; if (!a.g.visible) { a.jump = -1; a.flee = 0; return; }
+      var dk = Math.hypot(a.x - k.x, a.z - k.z), hop = 0, sp = 0.22, walk = true;
+      if (a.jump < 0 && a.flee <= 0 && dk < 2.5) { a.jump = 0; a.fx = (a.x - k.x) / (dk || 1); a.fz = (a.z - k.z) / (dk || 1); if (!a.told) { a.told = true; events.push({ type: 'armadillo' }); } }
+      if (a.jump >= 0) {           // straight up, as armadillos do when startled
+        a.jump += dt; var u = a.jump / 0.5; hop = Math.sin(Math.min(1, u) * Math.PI) * 0.6; walk = false;
+        if (u >= 1) { a.jump = -1; a.flee = 2.8; a.yaw = Math.atan2(a.fx, a.fz); }
+      } else if (a.flee > 0) { a.flee -= dt; sp = 2.6; }
+      else {
+        a.pause -= dt; a.turnT -= dt;
+        if (a.turnT <= 0) { a.turnT = 1.5 + R() * 3.5; a.want = a.yaw + (R() - 0.5) * 2.2; if (Math.hypot(a.x - DILLOAT.x, a.z - DILLOAT.z) > 7) a.want = Math.atan2(DILLOAT.x - a.x, DILLOAT.z - a.z); if (R() < 0.35) a.pause = 1 + R() * 2; }
+        if (a.want != null) a.yaw = turnTo(a.yaw, a.want, dt * 2);
+        if (a.pause > 0) walk = false;
+      }
+      if (walk) {
+        var nx = a.x + Math.sin(a.yaw) * sp * dt, nz = a.z + Math.cos(a.yaw) * sp * dt;
+        if (dry(nx + Math.sin(a.yaw) * 0.6, nz + Math.cos(a.yaw) * 0.6) && Math.abs(world.height(nx, nz) - world.height(a.x, a.z)) < 0.12) { a.x = nx; a.z = nz; } else { a.yaw += Math.PI * 0.6; a.want = a.yaw; }
+      }
+      a.g.position.set(a.x, world.height(a.x, a.z) + hop, a.z); a.g.rotation.y = a.yaw;
+      var fast = a.flee > 0 ? 22 : 9, sw = walk ? Math.sin(t * fast) : 0;
+      a.legs.forEach(function (l, q) { l.rotation.x = (q % 3 === 0 ? 1 : -1) * 0.5 * sw; });
+      a.body.rotation.z = walk ? 0.05 * Math.sin(t * fast * 0.5) : 0; a.body.rotation.x = a.jump >= 0 ? -0.3 : 0;
+      a.head.rotation.x = a.pause > 0 && a.jump < 0 ? 0.35 + 0.12 * Math.sin(t * 9) : a.flee > 0 ? -0.2 : 0.18 + 0.06 * Math.sin(t * 7);   // nose down, rooting
+    }
+    // ---------------- a roadrunner on the county road by day: it stands and looks about, dashes a little way, and is off up the road when he comes near
+    var RRAT = firstDry([[72, 33], [72, 40], [72.5, 26], [72, -18]]);
+    var rrun = (function () {
+      var g = new THREE.Group(); g.name = 'Roadrunner';
+      var body = new THREE.Group(); body.position.y = 0.24; g.add(body);
+      body.add(at(mesh(ell(0.065, 0.065, 0.15, 8), 'rrun'), 0, 0, 0, -0.15, 0, 0)); body.add(at(mesh(ell(0.045, 0.035, 0.1, 6), 'rrunL'), 0, -0.035, 0.03));
+      var tail = new THREE.Group(); tail.position.set(0, 0.02, -0.13); body.add(tail); tail.add(at(mesh(new THREE.BoxGeometry(0.045, 0.012, 0.3), 'rrun'), 0, 0, -0.14));
+      var neck = new THREE.Group(); neck.position.set(0, 0.03, 0.12); body.add(neck);
+      neck.add(at(mesh(new THREE.CylinderGeometry(0.025, 0.035, 0.12, 6), 'rrunL'), 0, 0.05, 0.02, 0.4, 0, 0));
+      var head = new THREE.Group(); head.position.set(0, 0.11, 0.05); neck.add(head);
+      head.add(mesh(ell(0.035, 0.032, 0.045, 6), 'rrun')); head.add(at(mesh(new THREE.ConeGeometry(0.012, 0.09, 4), 'heronK', true), 0, -0.005, 0.085, Math.PI / 2, 0, 0));
+      head.add(at(mesh(new THREE.BoxGeometry(0.014, 0.04, 0.07), 'rrun'), 0, 0.04, -0.02, -0.5, 0, 0));
+      var legs = [-1, 1].map(function (s) { var l = new THREE.Group(); l.position.set(s * 0.03, 0.2, 0); g.add(l); l.add(at(mesh(new THREE.BoxGeometry(0.012, 0.2, 0.012), 'leg'), 0, -0.1, 0)); return l; });
+      g.scale.setScalar(1.7); g.traverse(function (o) { if (o.isMesh) o.castShadow = true; }); g.visible = false; grp.add(g);
+      return { g: g, body: body, tail: tail, head: head, legs: legs, x: RRAT ? RRAT.x : 0, z: RRAT ? RRAT.z : 0, yaw: 0, dash: 0, wait: 3, away: 0, flee: 0, look: 0, lookT: 1, told: false };
+    })();
+    function rrunUpdate(t, dt, k) {
+      var r = rrun; if (!RRAT) return; var h = k.hour == null ? 12 : ((k.hour % 24) + 24) % 24, on = h > 7 && h < 17.8 && !k.storm;
+      if (r.away > 0) { r.away -= dt; r.g.visible = false; if (r.away <= 0) { r.x = RRAT.x; r.z = RRAT.z; r.flee = 0; } return; }
+      r.g.visible = on && Math.hypot(r.x - k.x, r.z - k.z) < 60; if (!r.g.visible) return;
+      var dk = Math.hypot(r.x - k.x, r.z - k.z), sp = 0;
+      if (r.flee <= 0 && dk < 3.0) { r.flee = 2.2; r.yaw = r.z >= k.z ? 0 : Math.PI; r.dash = 0; if (!r.told) { r.told = true; events.push({ type: 'roadrunner' }); } }
+      if (r.flee > 0) { r.flee -= dt; sp = 8.5; if (r.flee <= 0) { r.away = 45; r.g.visible = false; return; } }
+      else if (r.dash > 0) { r.dash -= dt; sp = 4.2; }
+      else { r.wait -= dt; if (r.wait <= 0) { r.wait = 3 + R() * 6; r.dash = 0.5 + R() * 0.7; r.yaw = (r.z > RRAT.z + 5 ? Math.PI : r.z < RRAT.z - 5 ? 0 : (R() < 0.5 ? 0 : Math.PI)) + (R() - 0.5) * 0.25; } }
+      if (sp > 0) { var nx = r.x + Math.sin(r.yaw) * sp * dt, nz = r.z + Math.cos(r.yaw) * sp * dt; if (dry(nx, nz)) { r.x = nx; r.z = nz; } else if (r.flee > 0) { r.away = 45; r.g.visible = false; return; } else r.dash = 0; }
+      r.g.position.set(r.x, world.height(r.x, r.z), r.z); r.g.rotation.y = turnTo(r.g.rotation.y, r.yaw, Math.min(1, dt * 10));
+      var run = sp > 0; r.legs.forEach(function (l, q) { l.rotation.x = run ? (q ? 1 : -1) * 1.0 * Math.sin(t * 34) : 0; });
+      r.body.rotation.x = run ? 0.28 : 0; r.tail.rotation.x = run ? -0.25 : 0.5 + 0.25 * Math.sin(t * 1.7) + (Math.sin(t * 0.9) > 0.9 ? 0.4 : 0);
+      r.lookT -= dt; if (r.lookT <= 0) { r.lookT = 0.8 + R() * 2; r.look = (R() - 0.5) * 2.2; }
+      r.head.rotation.y += ((run ? 0 : r.look) - r.head.rotation.y) * Math.min(1, dt * 8);
+    }
+    // ---------------- a largemouth bass in the Blue Hole: now and then it clears the water and goes back in
+    var BASSAT = S.snag ? { x: S.snag.x, z: S.snag.z } : null;
+    var bass = (function () {
+      var g = new THREE.Group(); g.name = 'Bass';
+      g.add(mesh(ell(0.05, 0.075, 0.2, 8), 'bass')); g.add(at(mesh(ell(0.04, 0.04, 0.16, 6), 'bassL'), 0, -0.04, 0.01));
+      g.add(at(mesh(new THREE.BoxGeometry(0.012, 0.13, 0.09), 'bass'), 0, 0, -0.23, 0, 0, 0)); g.add(at(mesh(new THREE.BoxGeometry(0.01, 0.05, 0.12), 'bass'), 0, 0.085, -0.02));
+      g.scale.setScalar(1.5); g.traverse(function (o) { if (o.isMesh) o.castShadow = false; }); g.visible = false; grp.add(g);
+      return { g: g, wait: 6 + R() * 6, t: -1, x: 0, z: 0, yaw: 0, wl: 0, told: false };
+    })();
+    function bassUpdate(t, dt, k) {
+      var b = bass; if (!BASSAT) return; var h = k.hour == null ? 12 : ((k.hour % 24) + 24) % 24, on = h > 6 && h < 20.8 && !k.storm, dk = Math.hypot(BASSAT.x - k.x, BASSAT.z - k.z);
+      if (b.t < 0) {
+        b.g.visible = false; if (!on || dk > 22) return;
+        b.wait -= dt; if (b.wait > 0) return;
+        b.wait = 9 + R() * 12;
+        for (var tries = 0; tries < 8; tries++) {
+          var a = R() * 6.28, rr = R() * 2.4, x = BASSAT.x + Math.cos(a) * rr, z = BASSAT.z + Math.sin(a) * rr, yaw = R() * 6.28, wl = world.water(x, z), wl2 = world.water(x + Math.sin(yaw) * 1.1, z + Math.cos(yaw) * 1.1);
+          if (wl != null && wl2 != null && wl - world.height(x, z) > 0.25) { b.x = x; b.z = z; b.yaw = yaw; b.wl = wl; b.t = 0; world.splash(x, z, 1.1); events.push({ type: 'bassJump', near: dk, first: !b.told && dk < 12 }); if (dk < 12) b.told = true; break; }
+        }
+        return;
+      }
+      b.t += dt; var u = b.t / 0.85;
+      if (u >= 1) { b.t = -1; b.g.visible = false; world.splash(b.x + Math.sin(b.yaw) * 1.1, b.z + Math.cos(b.yaw) * 1.1, 1.5); events.push({ type: 'bassPlop', near: dk }); return; }
+      b.g.visible = true;
+      b.g.position.set(b.x + Math.sin(b.yaw) * 1.1 * u, b.wl - 0.1 + Math.sin(u * Math.PI) * 0.62, b.z + Math.cos(b.yaw) * 1.1 * u);
+      b.g.rotation.set(-1.15 * Math.cos(u * Math.PI), b.yaw, 0.5 * Math.sin(u * 9), 'YXZ');
+    }
+    // ---------------- a luna moth: at night, once he carries the lantern, one comes to it and keeps it company
+    var luna = (function () {
+      var g = new THREE.Group(), wings = []; g.name = 'LunaMoth';
+      [-1, 1].forEach(function (s) {
+        var wg = new THREE.Group(); g.add(wg);
+        var w = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.006, 0.09), W.paint('luna', { glow: true })); w.position.set(s * 0.055, 0, 0.01); wg.add(w);
+        var tl = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.006, 0.1), W.paint('luna', { glow: true })); tl.position.set(s * 0.05, 0, -0.08); tl.rotation.y = s * 0.3; wg.add(tl); wings.push(wg);
+      });
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.02, 0.07), W.paint('white', { glow: true })));
+      g.scale.setScalar(2.2); g.traverse(function (o) { if (o.isMesh) { o.castShadow = false; o.receiveShadow = false; } }); g.visible = false; grp.add(g);
+      return { g: g, wings: wings, t: 0, x: 0, y: 0, z: 0, told: false };
+    })();
+    function lunaUpdate(t, dt, k) {
+      var m = luna; if (!k.lamp || k.storm) { m.g.visible = false; m.t = 0; return; }
+      m.t += dt; if (m.t < 12) { m.g.visible = false; return; }
+      var inn = Math.min(1, (m.t - 12) / 4), a = t * 1.7 + Math.sin(t * 0.6) * 1.2, rr = 0.75 + 0.25 * Math.sin(t * 2.3) + (1 - inn) * 6;
+      var tx = k.x + Math.cos(a) * rr, tz = k.z + Math.sin(a) * rr, ty = (k.y || 0) + 1.35 + 0.25 * Math.sin(t * 3.1) + (1 - inn) * 1.5;
+      if (!m.g.visible) { m.x = tx; m.y = ty; m.z = tz; m.g.visible = true; }
+      var px = m.x, pz = m.z, kk = Math.min(1, dt * 5); m.x += (tx - m.x) * kk; m.y += (ty - m.y) * kk; m.z += (tz - m.z) * kk;
+      m.g.position.set(m.x, m.y, m.z); if (Math.hypot(m.x - px, m.z - pz) > 1e-4) m.g.rotation.y = Math.atan2(m.x - px, m.z - pz);
+      var f = Math.sin(t * 26); m.wings[0].rotation.z = 0.2 + 0.85 * f; m.wings[1].rotation.z = -0.2 - 0.85 * f;
+      if (!m.told && inn >= 1) { m.told = true; events.push({ type: 'luna' }); }
+    }
+    // what there is to see, for the field notes in his journal: [id, the things themselves, how near he must come]
+    function gs(a) { return a.map(function (q) { return q.g; }); }
+    var allFish = []; schools.forEach(function (sc) { sc.fish.forEach(function (f) { allFish.push(f.g); }); });
+    var sight = [
+      { id: 'heron', objs: [heron.g], r: 8 }, { id: 'turtles', objs: gs(turtles), r: 6 }, { id: 'minnows', objs: allFish, r: 2.6 }, { id: 'frog', objs: gs(frogs), r: 2.8 },
+      { id: 'dragonfly', objs: gs(dflies), r: 3.2 }, { id: 'butterfly', objs: gs(bflies), r: 3.2 }, { id: 'teal', objs: gs(ducks), r: 6.5 }, { id: 'vulture', objs: gs(vultures), r: 8 },
+      { id: 'cardinal', objs: [card.g], r: 5 }, { id: 'roadrunner', objs: [rrun.g], r: 8 }, { id: 'bass', objs: [bass.g], r: 10 }, { id: 'deer', objs: gs(deer), r: 10 },
+      { id: 'bat', objs: BATS.marks, r: 13 }, { id: 'armadillo', objs: [dillo.g], r: 5.5 }, { id: 'owl', objs: [owl.g], r: 8 }, { id: 'luna', objs: [luna.g], r: 3 }
+    ];
+
     return {
-      group: grp, heron: heron, turtles: turtles, frogs: frogs, ducks: ducks, events: events, flyOver: flyOver, vultures: vultures, owl: owl, deer: deer, cardinal: card,
+      group: grp, heron: heron, turtles: turtles, frogs: frogs, ducks: ducks, events: events, flyOver: flyOver, vultures: vultures, owl: owl, deer: deer, cardinal: card, bats: BATS, armadillo: dillo, roadrunner: rrun, bass: bass, luna: luna, sight: sight,
       flying: function () { return !!(flock && flock.run); },
-      update: function (t, dt, k) { heronUpdate(t, dt, k); turtlesUpdate(t, dt, k); minnowsUpdate(t, dt, k); frogsUpdate(t, dt, k); dfliesUpdate(t, dt, k); bfliesUpdate(t, dt, k); ducksUpdate(t, dt, k); flockUpdate(t, dt); vulturesUpdate(t, dt, k); owlUpdate(t, dt, k); deerUpdate(t, dt, k); cardUpdate(t, dt, k); }
+      update: function (t, dt, k) { heronUpdate(t, dt, k); turtlesUpdate(t, dt, k); minnowsUpdate(t, dt, k); frogsUpdate(t, dt, k); dfliesUpdate(t, dt, k); bfliesUpdate(t, dt, k); ducksUpdate(t, dt, k); flockUpdate(t, dt); vulturesUpdate(t, dt, k); owlUpdate(t, dt, k); deerUpdate(t, dt, k); cardUpdate(t, dt, k); batsUpdate(t, dt, k); dilloUpdate(t, dt, k); rrunUpdate(t, dt, k); bassUpdate(t, dt, k); lunaUpdate(t, dt, k); }
     };
   };
 })(typeof window !== 'undefined' ? window : globalThis);

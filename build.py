@@ -8,7 +8,7 @@ g = json.load(open(os.path.join(S, '_glue.json')))
 names = sorted(os.path.basename(p) for p in glob.glob(os.path.join(S, '*.js')))
 vendor = [n for n in names if n.startswith('0')]
 game = [n for n in names if not n.startswith('0')]
-HEAD = '''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+HEAD = '''<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Richard Sale, the Philosopher King, walks down to Tom's creek after a week of high water, to see what it has brought.">
 <meta property="og:title" content="What the Water Brings"><meta property="og:description" content="The Philosopher King walks a creek valley the morning after the flood. Finds, five old shapes, and poems kept along the way.">
 <meta name="theme-color" content="#1b1a18">

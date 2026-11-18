@@ -6,4 +6,6 @@ Richard Sale, the Philosopher King, walks down to Tom's creek after a week of hi
 
 - `index.html` is the whole game in one file. This is the page the business card's QR code opens, so keep its name and place.
 - `src/` holds the game in parts. `python3 build.py` glues them into `out/index.html`; copy that over `index.html` to publish.
-- `tools/shots.py` takes screenshots of the game for checking.
+- `tools/shots.py` takes screenshots of the game for checking; `tools/flow.py` plays the whole game by script; `tools/perf.py` measures speed.
+- `v4/` is the version before the Nov 18 upgrade pass, kept as it was: https://chriskizer91-ops.github.io/what-the-water-brings/v4/
+- `docs/handoff-v5-upgrade-pass.md` says what the upgrade pass added.

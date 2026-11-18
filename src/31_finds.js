@@ -21,6 +21,42 @@
   ];
   F.collById = {}; F.COLLS.forEach(function (c) { F.collById[c.id] = c; });
 
+  // the field notes (the upgrade pass): who lives along the creek. Each is ticked off in the journal the first time he comes near enough to see it.
+  // name, where to look (shown until it is seen), and the line kept once it is. Written for the game, for the family to rewrite.
+  F.FIELD = [
+    { id: 'heron', name: 'Great blue heron', where: 'at the Heron Pool, and wherever the creek goes quiet', note: 'Stands like a question nobody has answered yet.' },
+    { id: 'turtles', name: 'Red-eared sliders', where: 'on the log at the stock pond', note: 'Three on a log, in order of seniority.' },
+    { id: 'minnows', name: 'Minnows', where: 'in the still pools, once he wades in', note: 'A handful of dropped silver that picks itself up again.' },
+    { id: 'frog', name: 'Leopard frog', where: 'on the banks, close to the water', note: 'Says one thing, and means it.' },
+    { id: 'dragonfly', name: 'Dragonfly', where: 'over the pools', note: 'Reads the water a line at a time, and never loses its place.' },
+    { id: 'butterfly', name: 'Monarch', where: 'among the wildflowers', note: 'On its way to Mexico, and in no hurry about it.' },
+    { id: 'teal', name: 'Blue-winged teal', where: 'on the spring pool and the stock pond', note: 'Small, quiet ducks. The blue only shows when they fly.' },
+    { id: 'vulture', name: 'Turkey vulture', where: 'up, over the valley, in the afternoon', note: 'Rides the warm air in circles and never once flaps for it.' },
+    { id: 'cardinal', name: 'Northern cardinal', where: 'about the trailhead by day', note: 'The one bird nobody has to look up.' },
+    { id: 'swallow', name: 'Swallows', where: 'low over the meadow and the water, now and then by day', note: 'Six of them, writing something quick across the meadow.' },
+    { id: 'roadrunner', name: 'Greater roadrunner', where: 'on the county road, south of the crossing, by day', note: 'It can fly. It runs anyway, as a matter of principle.' },
+    { id: 'bass', name: 'Largemouth bass', where: 'in the Blue Hole', note: 'Leaves the water once in a while to check on the air.' },
+    { id: 'deer', name: 'White-tailed deer', where: 'in the pond meadow, at dusk and at dawn', note: 'Three, grazing. They saw him long before he saw them.' },
+    { id: 'bat', name: 'Mexican free-tailed bats', where: 'by the cave under the bluff, in the evening', note: 'They leave the cave at dusk, every one, and none of them looks back at the wall.' },
+    { id: 'armadillo', name: 'Nine-banded armadillo', where: 'along the main trail, in the evening and at night', note: 'A small knight who has lost his horse and does not miss it.' },
+    { id: 'owl', name: 'Great horned owl', where: 'on the trestle at night', note: 'Asks who, and waits, and asks again.' },
+    { id: 'firefly', name: 'Fireflies', where: 'over the grass as the light goes', note: 'Small lanterns with nobody carrying them.' },
+    { id: 'luna', name: 'Luna moth', where: 'about him at night, once he carries the lantern', note: 'Pale green, and quite sure the lantern is the moon.' }
+  ];
+  // skipping stones: flat stones are stacked by four of the pools. What is said after a throw, by the number of skips.
+  F.SKIP_AT = [
+    { id: 'heron', label: 'the Heron Pool', where: { bank: 'main', x: -57, z: -6, f: 0.3, side: 1 } },
+    { id: 'bluehole', label: 'the Blue Hole', where: { bank: 'main', x: 47, z: 7, f: 0.35, side: 1 } },
+    { id: 'pond', label: 'the stock pond', where: { pond: 1.13, a: -0.8 } },
+    { id: 'spring', label: 'the spring pool', where: { xz: [36.2, 55.6] } }
+  ];
+  F.NUMS = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve'];
+  F.skipLine = function (n) {
+    if (n <= 0) return 'Plunk. Not every stone is a skipper.';
+    var w = F.NUMS[Math.min(n, 12)] + (n === 1 ? ' skip' : ' skips');
+    return n === 1 ? w + '. A start.' : n <= 3 ? w + '.' : n <= 6 ? w + '. Respectable.' : n <= 9 ? w + '. He looks round to see if anyone saw.' : w + '. The stone may still be going.';
+  };
+
   // where: a spot the world resolves (see main.js); hint: for the journal; tag: Tom's label; caption: what the page says when he picks it up
   F.FINDS = [
     // ---- Things the Water Rounded
@@ -610,7 +646,7 @@
     flame: ['#d2501c', '#f39030', '#ffd25a'], ember: ['#5a1e10', '#8a2e14', '#c04a1c'], shade: ['#241e1a', '#2e2620', '#3a3028'], beam: ['#f6e6b0', '#fff2c8', '#fffbe8']
   };
   for (var k in NEW) { PAINT[k] = NEW[k]; NEW[k].forEach(W.note); }
-  ['ink', 'page', 'glint', 'rust', 'steel', 'wood', 'trunk', 'white'].forEach(function (k) { PAINT[k].forEach(W.note); });
+  ['ink', 'page', 'glint', 'rust', 'steel', 'wood', 'trunk', 'white', 'lime', 'limeD', 'gravel'].forEach(function (k) { PAINT[k].forEach(W.note); });
   function mesh(geo, key, flat) { var m = new THREE.Mesh(geo, W.paint(key, { flat: flat !== false })); m.castShadow = true; m.receiveShadow = true; return m; }
   function at(m, x, y, z, rx, ry, rz) { m.position.set(x || 0, y || 0, z || 0); m.rotation.set(rx || 0, ry || 0, rz || 0); return m; }
   function box(w, h, d) { return new THREE.BoxGeometry(w, h, d); }
@@ -622,6 +658,16 @@
   function tube(pts, r, n) { return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(function (p) { return new THREE.Vector3(p[0], p[1], p[2]); })), n || 20, r, 6, false); }
   function bottleG(r, h, neck) { return lathe([[0, 0], [r, 0], [r * 1.05, h * 0.06], [r * 1.05, h * 0.65], [r * 0.6, h * 0.8], [neck, h * 0.86], [neck, h], [0, h]], 10); }
 
+  // a stack of flat skipping stones (by four of the pools), and one stone for his hand and for the water
+  F.stonePile = function () {
+    var g = new THREE.Group(); g.name = 'SkippingStones';
+    [[0.17, 0.045, 'lime', 0, 0], [0.14, 0.04, 'gravel', 0.02, -0.01], [0.115, 0.035, 'limeD', -0.015, 0.012], [0.09, 0.03, 'lime', 0.01, 0], [0.065, 0.026, 'gravel', -0.005, -0.008]].reduce(function (y, q, i) {
+      var m = mesh(cyl(q[0], q[0] * 1.06, q[1], 9), q[2]); m.scale.z = 0.82; m.position.set(q[3], y + q[1] / 2, q[4]); m.rotation.y = i * 1.3; g.add(m); return y + q[1];
+    }, 0);
+    [[0.3, 0.1], [-0.26, 0.2], [0.12, -0.3]].forEach(function (q, i) { var m = mesh(cyl(0.07, 0.075, 0.03, 8), i % 2 ? 'gravel' : 'lime'); m.scale.z = 0.8; m.position.set(q[0], 0.015, q[1]); m.rotation.y = i * 2.1; g.add(m); });
+    return g;
+  };
+  F.skipStone = function () { var m = mesh(cyl(0.05, 0.052, 0.018, 8), 'lime'); m.scale.z = 0.82; return m; };
   // each sits with its base at y = 0, a little larger than life so it reads at pixel size
   var BUILD = {
     glassG: function (g) { g.add(at(mesh(new THREE.DodecahedronGeometry(0.07, 0), 'glassG'), 0, 0.03, 0, 0.3, 0.2, 0)); g.children[0].scale.set(1.4, 0.45, 1); },

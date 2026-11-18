@@ -19,11 +19,11 @@
     medium: { pix: 'ultra', king: 4, creek: 4, note: 'Ultra pixels, the king at 4×, the creek at 4×. For laptops and the TV.' },
     high: { pix: 'ultra', king: 6, creek: 6, note: 'Ultra pixels, the king and the creek at 6×. For a strong laptop.' }
   };
-  function fresh() { return { found: {}, hung: {}, tools: {}, nums: {}, n: 0, read: {}, wave: 1, quality: null, sound: true, map: true, carry: null, done: false, fog: '' }; }
+  function fresh() { return { found: {}, hung: {}, tools: {}, nums: {}, seen: {}, skip: { best: 0, n: 0 }, n: 0, read: {}, wave: 1, quality: null, sound: true, map: true, carry: null, done: false, fog: '' }; }
   var save = fresh();
   try { var raw = localStorage.getItem(KEY); if (raw) Object.assign(save, JSON.parse(raw)); } catch (e) {}
   if (/[?&]fresh/.test(Q)) save = fresh();
-  ['hung', 'tools', 'nums'].forEach(function (k) { if (!save[k]) save[k] = {}; }); if (!save.wave) save.wave = 1; if (!save.n) save.n = 0;
+  ['hung', 'tools', 'nums', 'seen'].forEach(function (k) { if (!save[k]) save[k] = {}; }); if (!save.skip) save.skip = { best: 0, n: 0 }; if (!save.wave) save.wave = 1; if (!save.n) save.n = 0;
   var phone = matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 900;
   // Easy to see: made for Richard Sale, whose sight is blurry (he knows a face at about a foot and a half), watching on a TV, cast from a laptop.
   // Everything big, bold and high contrast, the voice reading everything out. ?see=easy or ?see=normal in the address chooses it.
@@ -56,6 +56,7 @@
     var k = PhilosopherKing.createRig({ dims: V.DIMS, rest: V.REST }); PKToon2.build(k, 'A', { detail: det, merge: true });
     k.root.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
     ITEMS.forEach(function (f) { if (f.id !== 'waders' && !k.props[f.id]) k.addHeld(f.id, PKWaterFinds.heldProp(f.id)); });
+    k.addHeld('skipstone', PKWaterFinds.skipStone());
     k.detail = det;
     // his own paints carry alpha 0.875: the pixel pass keeps his outline in dark ink and leaves him out of the contact shading
     k.root.traverse(function (o) { if (o.isMesh && o.material && /^Toon2?_/.test(o.material.name || '')) o.material.opacity = 0.875; });
@@ -98,6 +99,25 @@
   });
   function showFinds() { ITEMS.forEach(function (f) { findObj[f.id].g.visible = available(f); }); }
   showFinds();
+  // skipping stones (the upgrade pass): a stack of flat stones by four of the pools. Standing at one, he can skip a stone across the water.
+  // Each spot throws along the longest reach of water in front of it.
+  var SKIPS = [];
+  PKWaterFinds.SKIP_AT.forEach(function (sp) {
+    var p = world.resolve(sp.where), x = p[0], z = p[1];
+    for (var tries = 0; tries < 12 && world.water(x, z) != null; tries++) { var q = world.nudge(x + (Math.random() - 0.5) * 2, z + (Math.random() - 0.5) * 2, false); x = q[0]; z = q[1]; }
+    if (world.water(x, z) != null) return;
+    var best = -1, dir = 0;
+    for (var a = 0; a < 32; a++) {
+      var an = a / 32 * 6.283, first = -1, run = 0;
+      for (var r = 1.0; r <= 14; r += 0.5) { var wet = world.water(x + Math.sin(an) * r, z + Math.cos(an) * r) != null; if (wet) { if (first < 0) first = r; run++; } else if (first >= 0) break; }
+      if (first >= 0 && first <= 2.6 && run > best) { best = run; dir = an; }
+    }
+    if (best < 7) return;
+    var g = PKWaterFinds.stonePile(); g.position.set(x, world.height(x, z), z); g.rotation.y = dir; g.scale.setScalar(2.1); g.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } }); scene.add(g);
+    SKIPS.push({ id: sp.id, label: sp.label, x: x, z: z, dir: dir, g: g });
+  });
+  var STONE = { m: PKWaterFinds.skipStone(), on: false }; STONE.m.visible = false; STONE.m.scale.multiplyScalar(1.5); scene.add(STONE.m);
+  function nearSkip() { if (P.wade > 0.03 || save.weather === 'storm') return null; var best = null, bd = 1.5; SKIPS.forEach(function (sp) { var d = Math.hypot(sp.x - P.x, sp.z - P.z); if (d < bd) { bd = d; best = sp; } }); return best; }
   var poemObj = {};
   POEMS.forEach(function (pm) {
     var s = world.spots.poems[pm.id], pg = PKWaterFinds.page(), y = s.y != null ? s.y : world.height(s.x, s.z);
@@ -299,7 +319,11 @@
     plop: function () { tone(320, 0, 0.12, 0.08); tone(180, 0.04, 0.16, 0.06); noise(0.12, 1200, 0.05); },
     done: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, i * 0.14, 0.9, 0.08); }); },
     ponder: function () { tone(392, 0, 1.4, 0.05, 'triangle'); tone(587, 0.18, 1.6, 0.04); tone(784, 0.36, 1.8, 0.03); tone(1175, 0.6, 2.0, 0.015); },
-    shutter: function () { noise(0.06, 3000, 0.18); noise(0.09, 1200, 0.12); }
+    shutter: function () { noise(0.06, 3000, 0.18); noise(0.09, 1200, 0.12); },
+    whip: function () { noise(0.12, 1800, 0.07); },
+    skip: function (n) { tone(880 + 70 * Math.min(n, 10), 0, 0.07, 0.05, 'triangle'); noise(0.06, 2600, 0.05); },
+    clack: function () { tone(1400, 0, 0.04, 0.06, 'square'); noise(0.05, 3200, 0.06); },
+    note: function () { tone(988, 0, 0.25, 0.04, 'triangle'); tone(1319, 0.09, 0.35, 0.035, 'triangle'); }
   };
   function setSound(on) {
     save.sound = on; persist();
@@ -339,7 +363,12 @@
     teal: 'The teal paddle off without hurry, as if they had somewhere better to be.',
     deer: 'Up go the white tails, and the deer are gone, over the meadow in three long bounds.',
     owl: 'The owl leaves the trestle without a sound. It has heard enough.',
-    cardinal: 'A cardinal, red as a stop sign, flits off into the bushes.'
+    cardinal: 'A cardinal, red as a stop sign, flits off into the bushes.',
+    bat: 'Bats, pouring out of the cave like smoke with somewhere to be.',
+    armadillo: 'The armadillo jumps straight up, lands, and leaves at once, in full armour.',
+    roadrunner: 'The roadrunner looks him over, finds him slow, and is gone up the road.',
+    bassJump: 'A bass clears the water, considers the air, and goes back.',
+    luna: 'A luna moth, pale green, has taken the lantern for the moon.'
   };
   var TOOL_LINES = { stick: 'With the stick he can lean against fast water now.', waders: 'With the waders on, the deep pools are his too.', lantern: 'The lantern will make the night a little smaller.' };
 
@@ -396,6 +425,15 @@
     var ku = document.createElement('ul'); ku.className = 'jlist';
     TOOLS.forEach(function (f) { var li = document.createElement('li'), g = have(f); li.className = g ? '' : 'no'; li.innerHTML = (g ? '<img class="ic" alt="" src="' + icon(f.id) + '">' : '<span class="ic">?</span>') + '<div><b></b><span></span></div><span></span>'; li.querySelector('b').textContent = g ? f.name : 'Not found yet'; li.querySelector('div span').textContent = g ? f.caption : 'Look ' + f.hint + '.'; ku.appendChild(li); });
     kit.appendChild(ku); root.appendChild(kit);
+    // the field notes: who lives along the creek, ticked off as he sees them
+    var nSeen = FIELD.filter(function (q) { return save.seen[q.id]; }).length;
+    var fn = document.createElement('details'); fn.className = 'jcoll' + (nSeen === FIELD.length ? ' full' : ''); fn.innerHTML = '<summary><b>Seen along the creek</b><span>' + nSeen + ' of ' + FIELD.length + '</span></summary><p class="jline">His field notes: who lives here, written down as he meets them.</p>';
+    var fu = document.createElement('ul'); fu.className = 'jlist';
+    FIELD.forEach(function (q) { var li = document.createElement('li'), got = !!save.seen[q.id]; li.className = got ? '' : 'no'; li.innerHTML = '<span class="ic">' + (got ? '\u2713' : '?') + '</span><div><b></b><span></span></div><span></span>'; li.querySelector('b').textContent = got ? q.name : 'Not seen yet'; li.querySelector('div span').textContent = got ? q.note : 'Look ' + q.where + '.'; fu.appendChild(li); });
+    fn.appendChild(fu);
+    var sk = document.createElement('p'); sk.className = 'jline'; var sb = save.skip || { best: 0, n: 0 };
+    sk.textContent = sb.n ? 'Skipping stones: his best is ' + PKWaterFinds.NUMS[Math.min(sb.best, 12)].toLowerCase() + (sb.best === 1 ? ' skip' : ' skips') + ', out of ' + sb.n + (sb.n === 1 ? ' throw.' : ' throws.') : 'Flat stones are stacked by the Heron Pool, the Blue Hole, the stock pond and the spring pool. They are for skipping.';
+    fn.appendChild(sk); root.appendChild(fn);
     var pc = document.createElement('details'); pc.className = 'jcoll'; pc.open = true; pc.innerHTML = '<summary><b>Poem stops</b><span>' + c.p + ' of ' + POEMS.length + '</span></summary>';
     var up = document.createElement('ul'); up.className = 'jlist';
     POEMS.forEach(function (pm) {
@@ -706,7 +744,69 @@
     if (nearStudio()) { openStudio(); return; }
     var f = nearFind(1.3); if (f) { pickUp(f); return; }
     if (inCave() && caveReady()) { startEnding(); return; }
-    if (save.weather === 'storm') stormWait();
+    if (save.weather === 'storm') { stormWait(); return; }
+    var sk = nearSkip(); if (sk && !WATCH.on && !PHOTO.on && !ENDING.on) skipStone(sk);
+  }
+  // ---------------------------------------------------------------- skipping a stone: the wind-up, the fling, and the stone going out over the water
+  function skipStone(sp) {
+    if (STONE.on) return;
+    P.target = null; P.speed = 0; P.yaw = sp.dir; var sx = sp.x + Math.cos(sp.dir) * 0.62, sz = sp.z - Math.sin(sp.dir) * 0.62; if (world.water(sx, sz) != null) { sx = sp.x - Math.cos(sp.dir) * 0.62; sz = sp.z + Math.sin(sp.dir) * 0.62; } if (world.water(sx, sz) == null) { P.x = sx; P.z = sz; }   // he stands beside the stack, not on it
+    P.lock = 'skip'; P.lockT = 1.9; P.skipT = 0; P.skipAt = sp; P.anim = ''; king.setItem('skipstone'); setAnim('skip', 0.15);
+  }
+  function stoneThrow(sp) {
+    // how many skips he is good for this time (mostly three or four; now and then a beauty), then cut short if the far bank comes first
+    var r = Math.random(), want = r < 0.07 ? 1 : r < 0.22 ? 2 : r < 0.44 ? 3 : r < 0.63 ? 4 : r < 0.77 ? 5 : r < 0.86 ? 6 : r < 0.92 ? 7 : r < 0.96 ? 8 : r < 0.98 ? 9 : 10 + Math.floor(Math.random() * 3);
+    var dx = Math.sin(sp.dir), dz = Math.cos(sp.dir), x = P.x + dx * 0.45, z = P.z + dz * 0.45, y = P.y + 0.75, legs = [], L = 2.3 + Math.random() * 0.5, hit = 'sink';
+    for (var i = 0; i <= want; i++) {
+      var nx = x + dx * L, nz = z + dz * L, wl = world.water(nx, nz);
+      if (wl == null) {   // short of the water, or over it: it lands on the bank
+        if (i === 0) { for (var b = 0.9; b > 0.2 && wl == null; b -= 0.15) { nx = x + dx * L * b; nz = z + dz * L * b; wl = world.water(nx, nz); } }
+        if (wl == null) { legs.push({ x0: x, z0: z, y0: y, x1: nx, z1: nz, y1: world.height(nx, nz) + 0.03, T: L / 7.5, H: 0.3 * Math.pow(0.8, i), end: 'bank' }); hit = 'bank'; break; }
+      }
+      legs.push({ x0: x, z0: z, y0: y, x1: nx, z1: nz, y1: wl + 0.02, T: Math.max(0.12, L / (7.5 - i * 0.25)), H: i === 0 ? 0.12 : 0.34 * Math.pow(0.8, i), end: i === want ? 'sink' : 'skip' });
+      x = nx; z = nz; y = wl + 0.02; L *= 0.78;
+    }
+    STONE.on = true; STONE.legs = legs; STONE.i = 0; STONE.t = 0; STONE.n = 0; STONE.m.visible = true; STONE.hit = hit; STONE.spin = 0;
+  }
+  function stoneUpdate(dt) {
+    if (P.lock === 'skip') {
+      P.skipT += dt; P.lockT -= dt;
+      if (P.skipAt && P.skipT >= 1.9 * 0.46) { king.setItem(null); stoneThrow(P.skipAt); P.skipAt = null; SFX.whip(); }
+      if (P.lockT <= 0) { P.lock = null; P.anim = ''; setAnim('idle', 0.3); king.setItem(carryItem()); }
+    }
+    if (!STONE.on) return;
+    var g = STONE.legs[STONE.i]; STONE.t += dt; STONE.spin += dt * 30;
+    var u = Math.min(1, STONE.t / g.T);
+    STONE.m.position.set(g.x0 + (g.x1 - g.x0) * u, g.y0 + (g.y1 - g.y0) * u + 4 * g.H * u * (1 - u), g.z0 + (g.z1 - g.z0) * u); STONE.m.rotation.y = STONE.spin;
+    if (u < 1) return;
+    if (g.end === 'skip') { STONE.n++; world.splash(g.x1, g.z1, 0.55); SFX.skip(STONE.n); STONE.i++; STONE.t = 0; return; }
+    STONE.on = false; STONE.m.visible = false;
+    if (g.end === 'sink') { world.splash(g.x1, g.z1, 1.0); SFX.plop(); } else SFX.clack();
+    var n = STONE.n, best = n > (save.skip.best || 0) && n > 1;
+    save.skip.n = (save.skip.n || 0) + 1; if (n > (save.skip.best || 0)) save.skip.best = n; persist();
+    toast(PKWaterFinds.skipLine(n) + (g.end === 'bank' && n > 0 ? ' It fetches up on the far bank.' : '') + (best && save.skip.n > 1 ? ' His best yet.' : ''), 3.4);
+  }
+  // ---------------------------------------------------------------- the field notes: each creature is written down the first time he comes near enough to see it
+  var FIELD = PKWaterFinds.FIELD, SIGHT = { t: 1 }; var _sg = new THREE.Vector3();
+  function noteSeen(id) {
+    if (save.seen[id] || WATCH.on) return; var f = FIELD.filter(function (q) { return q.id === id; })[0]; if (!f) return;
+    save.seen[id] = true; persist(); SFX.note();
+    var n = FIELD.filter(function (q) { return save.seen[q.id]; }).length;
+    toast('In his field notes: ' + f.name.charAt(0).toLowerCase() + f.name.slice(1) + '. ' + n + ' of ' + FIELD.length + '.', 3.4);
+    if (n === FIELD.length) toast('Everything that lives along the creek is in his field notes now.', 5);
+  }
+  function sightUpdate(dt) {
+    SIGHT.t -= dt; if (SIGHT.t > 0) return; SIGHT.t = 0.5;
+    if (!playing || modal || ENDING.on || PHOTO.on || WATCH.on || SKY.lapse) return;
+    life.sight.forEach(function (sg) {
+      if (save.seen[sg.id]) return;
+      for (var i = 0; i < sg.objs.length; i++) {
+        var o = sg.objs[i]; if (!visible(o) || Math.hypot(o.position.x - P.x, o.position.z - P.z) > sg.r) continue;
+        _sg.copy(o.position).project(cam); if (Math.abs(_sg.x) < 0.96 && Math.abs(_sg.y) < 0.92) { noteSeen(sg.id); break; }   // and it has to be in the picture
+      }
+    });
+    if (!save.seen.swallow && AMB.birds && AMB.birds.t > 1.2) noteSeen('swallow');
+    if (!save.seen.firefly && AMB.fm && AMB.fm.visible && AMB.fm.count > 8) noteSeen('firefly');
   }
   function pickUp(f) {
     var o = findObj[f.id]; if (GUIDE.goal && GUIDE.goal.f === f) guideStop(); if (!f.coll) GUIDE.skip = {};
@@ -915,7 +1015,7 @@
     if (FIRE.amt > 0.02) { var ff = 0.9 + 0.07 * Math.sin(time * 11.3) + 0.04 * Math.sin(time * 27.1 + 2.1) + 0.03 * Math.sin(time * 5.3); LS.push({ x: FIRE.x, y: FIRE.y + 0.35, z: FIRE.z, r: 7.5 * ff, c: [1.3, 0.88, 0.56], a: Math.min(1, FIRE.amt * 1.1) * ff, shadow: false }); }
     if (n > 0.3 && LS.length < 3) { var stu = world.spots.studio, sd = Math.hypot(stu.x - P.x, stu.z - P.z); if (sd < 30) LS.push({ x: stu.x + 0.6, y: world.height(stu.x, stu.z) + 1.3, z: stu.z + 2.2, r: 4.5, c: [1.2, 1.0, 0.7], a: (n - 0.3) * 1.2, shadow: false }); }
     px.setLights(LS);
-    var night = isNight(); if (night !== WORLD.night) { WORLD.night = night; showFinds(); }
+    var night = isNight(); if (night !== WORLD.night) { WORLD.night = night; showFinds(); if (night && playing && !save.tools.lantern && !save.lampHint && !WATCH.on && save.weather !== 'storm') { save.lampHint = true; toast('Dark already. Tom keeps a lantern in his studio.', 5); } }
     $('clock').textContent = clockLabel();
     // the storm: rain, lightning and thunder; the first bolt finds the lone oak in the pond meadow
     rainUpdate(dt, st);
@@ -1034,7 +1134,7 @@
       L.m.instanceMatrix.needsUpdate = true;
     });
     // fireflies from dusk to late evening, not in rain; over the grass round him
-    var ff = h > 19.2 && h < 23.8 && st < 0.2 ? Math.min(1, (h - 19.2) / 0.8) * Math.min(1, (23.8 - h) / 0.8) : 0;
+    var ff = h > 18.3 && h < 23.8 && st < 0.2 ? Math.min(1, (h - 18.3) / 0.8) * Math.min(1, (23.8 - h) / 0.8) : 0;   // (the upgrade pass: from dusk, so the evening has them too)
     AMB.fm.visible = ff > 0.02 && !ENDING.on;
     if (AMB.fm.visible) {
       var fc = 0;
@@ -1047,6 +1147,13 @@
         _ao.position.set(wx, y, wz); _ao.rotation.set(0, 0, 0); _ao.scale.setScalar(lit > 0.15 ? 1 : 0.0001); _ao.updateMatrix(); AMB.fm.setMatrixAt(fc++, _ao.matrix);
       });
       AMB.fm.count = fc; AMB.fm.instanceMatrix.needsUpdate = true;
+    }
+    // fish rising (the upgrade pass): at dawn and in the evening, small rings open on the still water near him
+    AMB.riseT = (AMB.riseT || 2) - dt;
+    if (AMB.riseT <= 0 && st < 0.2 && ((h > 5.6 && h < 8.2) || (h > 17.4 && h < 21)) && !ENDING.on) {
+      AMB.riseT = 1.2 + Math.random() * 3.2;
+      var rx2 = t.x + (Math.random() - 0.5) * 16, rz2 = t.z + (Math.random() - 0.5) * 10;
+      if (world.water(rx2, rz2) != null && !world.fast(rx2, rz2) && world.water(rx2, rz2) - world.height(rx2, rz2) > 0.2) world.splash(rx2, rz2, 0.3 + Math.random() * 0.25);
     }
     // mist: early morning, and all the morning after the storm, lying on the water near him
     var after = save.stormed && save.wave >= 2 && save.day >= 2 && h < 12 ? 1 : 0;
@@ -2119,6 +2226,7 @@
     if (P.lock === 'hold') { P.lockT -= dt; if (P.lockT <= 0) { P.lock = null; checkDone(); } }
     if (P.lock === 'getup') { P.lockT -= dt; if (P.lockT <= 0) { P.lock = null; setAnim('idle', 0.4); king.setItem(save.carry && have(PKWaterFinds.byId[save.carry]) ? save.carry : null); } }
     if (P.lock === 'rest') setAnim('sit');
+    stoneUpdate(dt); sightUpdate(dt);
     if (P.lock === 'ponder') { P.lockT -= dt; if (P.lockT <= 0) { P.lock = null; P.anim = ''; setAnim('idle', 0.4); king.setItem(carryItem()); } }
     if (P.jumpT < 0 && !P.lock) {
       if (P.speed < 0.08) idleMoves(dt);
@@ -2135,13 +2243,13 @@
 
     if (playing && !P.lock && !modal) { var f = nearFind(0.75); if (f) pickUp(f); }
     var free = !P.lock && !modal && $('cardWrap').hidden && playing;
-    var pmN = free ? nearPoem() : null, stN = free && !pmN && nearStudio(), fN = free && !pmN && !stN ? nearFind(1.3) : null, cN = free && !pmN && !stN && !fN && inCave() && caveReady(), wN = free && !pmN && !stN && !fN && !cN && save.weather === 'storm' && P.speed < 0.1;
-    var label = pmN ? 'Read · ' + pmN.label : stN ? 'studio' : fN ? 'Pick up' : cN ? 'cave' : wN ? 'wait' : '';
+    var pmN = free ? nearPoem() : null, stN = free && !pmN && nearStudio(), fN = free && !pmN && !stN ? nearFind(1.3) : null, cN = free && !pmN && !stN && !fN && inCave() && caveReady(), wN = free && !pmN && !stN && !fN && !cN && save.weather === 'storm' && P.speed < 0.1, kN = free && !pmN && !stN && !fN && !cN && !wN && !WATCH.on && !PHOTO.on && !ENDING.on && !STONE.on ? nearSkip() : null;
+    var label = pmN ? 'Read · ' + pmN.label : stN ? 'studio' : fN ? 'Pick up' : cN ? 'cave' : wN ? 'wait' : kN ? 'skip' : '';
     if (free && inCave() && !caveTold && !caveReady()) { caveTold = true; toast('A flat back wall, a ledge, an old fire ring. A room waiting for something.', 5); }
     if (label !== lastLabel) {
       lastLabel = label;
-      $('bAct').hidden = !label; $('bAct').textContent = pmN ? 'Read' : stN ? 'Studio' : cN ? (save.done ? 'The fire' : 'Set them out') : wN ? 'Wait it out' : 'Pick up';
-      $('prompt').classList.toggle('hidden', !label); $('promptText').textContent = pmN ? 'Read the poem · ' + pmN.label : stN ? 'Tom\u2019s studio · hang the finds' : cN ? (save.done ? 'Light the fire again' : 'Set the five solids on the ledge') : wN ? 'Sit out the storm' : 'Pick it up';
+      $('bAct').hidden = !label; $('bAct').textContent = pmN ? 'Read' : stN ? 'Studio' : cN ? (save.done ? 'The fire' : 'Set them out') : wN ? 'Wait it out' : kN ? 'Skip a stone' : 'Pick up';
+      $('prompt').classList.toggle('hidden', !label); $('promptText').textContent = pmN ? 'Read the poem · ' + pmN.label : stN ? 'Tom\u2019s studio · hang the finds' : cN ? (save.done ? 'Light the fire again' : 'Set the five solids on the ledge') : wN ? 'Sit out the storm' : kN ? 'Skip a stone across ' + kN.label : 'Pick it up';
     }
 
     // the valley: stream tiles round where the camera is looking, then ripples and creatures
@@ -2149,8 +2257,8 @@
     world.update(time, dt, { x: P.x, z: P.z });
     ITEMS.forEach(function (f, i) { var o = findObj[f.id]; if (!o.g.visible) return; o.glint.rotation.y = time * 1.6 + i; o.glint.position.y = 0.72 + 0.08 * Math.sin(time * 2.4 + i); var s = (0.8 + 0.25 * Math.max(0, Math.sin(time * 3 + i * 1.7))) * (PON.t > 0 && PON.shimmer.indexOf(o) >= 0 ? 1.8 : 1) * (EASY.on ? 2.2 : 1); o.glint.scale.setScalar(s); });
     POEMS.forEach(function (pm, i) { var o = poemObj[pm.id]; o.g.rotation.y = time * 0.9 + i; o.g.position.y = o.base + 0.07 * Math.sin(time * 1.8 + i) + (EASY.on ? 0.35 : 0); o.g.scale.setScalar(EASY.on ? 2.2 : 1); o.g.visible = !(P.lock === 'read' && nearPoem() === pm); });
-    life.update(time, dt, { x: P.x, z: P.z, wading: P.wade, hour: SKY.hour, storm: save.weather === 'storm' || LOOK.st > 0.4, camDir: [Math.sin(view.az), Math.cos(view.az)] });
-    while (life.events.length) { var ev = life.events.shift(); if (ev.type === 'hoot') { BIRDS.hoot(ev.near); continue; } if ((ev.type !== 'heron' || ev.first) && LINES[ev.type]) toast(LINES[ev.type]); if (ev.type === 'turtles' || ev.type === 'frog') SFX.plop(); }
+    life.update(time, dt, { x: P.x, z: P.z, y: P.y, lamp: !!save.tools.lantern && isNight() && !ENDING.on, ending: ENDING.on, wading: P.wade, hour: SKY.hour, storm: save.weather === 'storm' || LOOK.st > 0.4, camDir: [Math.sin(view.az), Math.cos(view.az)] });
+    while (life.events.length) { var ev = life.events.shift(); if (ev.type === 'hoot') { BIRDS.hoot(ev.near); continue; } if (ev.type === 'bassPlop') { if (ev.near < 14) SFX.plop(); continue; } if (ev.type === 'bassJump' && ev.near < 14) SFX.splash(); if ((ev.type !== 'heron' && ev.type !== 'bassJump' || ev.first) && LINES[ev.type]) toast(LINES[ev.type]); if (ev.type === 'turtles' || ev.type === 'frog') SFX.plop(); }
     BIRDS.update(dt); musicUpdate(dt);
     if (AU.creek) { var near = Math.max(0, 1 - world.waterNear(P.x, P.z) / 10); AU.creek.gain.value = 0.02 + 0.07 * near * near; }
 
@@ -2252,7 +2360,7 @@
     step: function (sec, fps) { var h = 1 / (fps || 30); for (var t = 0; t < sec - 1e-6; t += h) update(h); render(); },
     tick: function (sec, fps) { var h = 1 / (fps || 30); for (var t = 0; t < sec - 1e-6; t += h) update(h); },
     render: render, openMap: openMap, reveal: reveal, blocked: blocked, sky: SKY, rest: function (seatId, target) { restSeat = SEATS.filter(function (q) { return q.id === seatId; })[0] || { x: P.x, z: P.z, y: P.y, face: P.yaw, label: 'here' }; rest(target); }, seats: SEATS, startStorm: function () { startStorm(); }, endStorm: function () { endStorm(); }, setHour: function (h) { SKY.hour = h; save.hour = h; }, openStudio: openStudio, journal: function () { journal(); openModal('journalVeil'); }, icon: icon, findObj: findObj, available: available, pickUp: pickUp, setWave: function (w) { save.wave = w; showFinds(); }, items: ITEMS,
-    closeUp: closeUp, tilt: tilt, resetView: resetView,
+    closeUp: closeUp, tilt: tilt, resetView: resetView, skips: SKIPS, stone: STONE, skipStone: skipStone, nearSkip: nearSkip, noteSeen: noteSeen, field: FIELD, amb: AMB,
     ponder: ponder, say: say, voice: setVoice, PON: PON, easy: setEasy, EASY: EASY,
     watch: { start: watchStart, stop: watchStop, pause: watchPause, skip: watchSkip, state: WATCH, story: STORY },
     guide: { go: guideGo, stop: guideStop, plan: planRoute, next: nextGoal, state: GUIDE, nav: function () { if (!NAV) buildNav(); return NAV; }, lineOK: lineOK },

@@ -312,7 +312,10 @@
     REACH = {
       crown: solveArm(rig, plant(P({}), RS.thigh, RS.knee), 'R', hTop, new THREE.Vector3(0.6, 0.3, 0.2).normalize(), { init: [-2.2, -0.3, -0.6, -1.6, 0, 0, 0] }),
       look: solveArm(rig, plant(P({}), RS.thigh, RS.knee), 'R', look, new THREE.Vector3(0.3, 0.6, 0.6).normalize(), { init: [-1.0, 0, -0.3, -1.4, 0, 0, 0] }),
-      wave: solveArm(rig, plant(P({}), RS.thigh, RS.knee), 'R', wave, new THREE.Vector3(-0.1, 1, 0.1).normalize(), { init: [-0.9, 0, -0.9, -1.6, 0, 0, 0] })
+      wave: solveArm(rig, plant(P({}), RS.thigh, RS.knee), 'R', wave, new THREE.Vector3(-0.1, 1, 0.1).normalize(), { init: [-0.9, 0, -0.9, -1.6, 0, 0, 0] }),
+      // skipping a stone (the upgrade pass): the hand drawn back low at his side, then flung forward low and flat
+      back: solveArm(rig, plant(P({}), RS.thigh, RS.knee), 'R', shR.clone().add(new THREE.Vector3(-0.2, -0.2, -0.3)), null, { init: [0.8, 0, -0.5, -0.7, 0, 0, 0] }),
+      fling: solveArm(rig, plant(P({}), RS.thigh, RS.knee), 'R', shR.clone().add(new THREE.Vector3(-0.02, -0.16, 0.44)), null, { init: [-1.0, 0, -0.2, -0.3, 0, 0, 0] })
     };
     rig._reach = REACH;
     return REACH;
@@ -352,6 +355,22 @@
     var p = idleBase(0), R = REACH, w = bell(t, 0.2, 0.85), f = Math.sin(t * 6.28 * 2.5) * w;
     if (R && BEHIND && !BEHIND.sides) { var v = lerpArm(BEHIND.R, R.wave, w); v[2] += 0.14 * f; v[6] += 0.25 * f; armTo(p, 'R', v); p.Fingers_R = [0, 0, 0.1]; }
     p.Head = [RS.head - 0.12 * w, 0, 0.05 * w];
+    return p;
+  }
+  // skipping a stone: a little crouch and a turn away as the hand goes back, then the sidearm fling (let go at t = 0.46), the follow-through, and back to rest
+  var SKIP_AT = 0.46;
+  function skipFn(t) {
+    var p = idleBase(0), R = REACH, wind = bell(t, 0.34, 0.4) * (t < 0.4 ? 1 : 0), cr = bell(t, 0.3, 0.62);
+    var fl = t < 0.38 ? 0 : t < 0.5 ? ease((t - 0.38) / 0.12) : 1, back = ease(Math.min(1, t / 0.34)), home = t < 0.74 ? 0 : ease((t - 0.74) / 0.26);
+    var q = plant(P({}), RS.thigh - 0.32 * cr, RS.knee + 0.62 * cr);
+    ['Thigh_L', 'Thigh_R', 'Shin_L', 'Shin_R', 'Foot_L', 'Foot_R'].forEach(function (j) { p[j] = q[j]; }); p._pos = q._pos;
+    var rest = BEHIND && !BEHIND.sides ? BEHIND.R : [RS.armX || 0, 0, -(RS.armZ || 0.1), RS.fore || -0.2, 0, 0, 0];
+    if (R && R.back && R.fling) {
+      var v = t < 0.38 ? lerpArm(rest, R.back, back) : t < 0.74 ? lerpArm(R.back, R.fling, fl) : lerpArm(R.fling, rest, home);
+      armTo(p, 'R', v); p.Fingers_R = [0, 0, t > SKIP_AT && t < 0.8 ? 0.05 : 0.6];
+    }
+    var tw = -0.5 * back * (1 - fl) + 0.42 * fl * (1 - home);
+    p.Spine = [RS.spine + 0.22 * cr, tw, 0]; p.Hips = [0, tw * 0.35, 0]; p.Neck = [RS.neck - 0.1 * cr, -tw * 0.5, 0]; p.Head = [RS.head - 0.12 * cr, -tw * 0.4, 0];
     return p;
   }
   function stormFn(t) {            // standing in the gale with a hand on his crown to keep it on, hunched, shifting
@@ -478,6 +497,7 @@
     'wave':      { fn: waveFn,   dur: 3.2,  loop: false, mode: 'carry',  info: 'A small wave' },
     'storm':     { fn: stormFn,  dur: 2.0,  loop: true,  mode: 'carry',  info: 'Holding his crown on in the wind' },
     'wade':      { fn: wadeFn,   dur: 1.5,  loop: true,  mode: 'carry',  info: 'Wading: knees high, arms out' },
+    'skip':      { fn: skipFn,   dur: 1.9,  loop: false, mode: 'carry',  info: 'Skipping a stone: wind up, fling, follow through' },
   };
   function buildClip(name, fps) {
     var c = CLIPS[name], n = Math.round(c.dur * fps), times = [], k, tr = {}, pos = [], prev = {};
