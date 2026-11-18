@@ -367,7 +367,7 @@
     return { f: nf, s: ns, p: np, h: nh, bag: nf - nh };
   }
   var toastT = 0, toastQ = [];
-  function toast(msg, sec) { if (capT > 0 || toastT > 0 || (PON && PON.card > 0)) { if (toastQ.length < 3 && toastQ.every(function (q) { return q[0] !== msg; })) toastQ.push([msg, sec]); return; } var t = $('toast'); t.textContent = msg; t.classList.add('on'); toastT = (sec || 3.6) * (EASY.on ? 1.8 : 1); }
+  function toast(msg, sec) { if (capT > 0 || toastT > 0 || (PON && PON.card > 0)) { if (toastQ.length < 3 && toastQ.every(function (q) { return q[0] !== msg; })) toastQ.push([msg, sec]); return; } var t = $('toast'); t.textContent = msg; t.classList.add('on'); toastT = (sec || 3.6) * (EASY.on ? 1.8 : 1); if ((save.voice || (WATCH && WATCH.on)) && !speechBusy()) { var ts = recFor(msg); if (ts) speak([[null, ts]]); } }
   var capT = 0;
   // the caption card: Tom's specimen label (number, name, what it is, where), the line about it, and its picture
   function caption(f) {
@@ -378,7 +378,7 @@
     $('capN').textContent = f.coll === 'solids' ? counts().s + ' of 5' : f.coll ? counts().f + ' of ' + WALL.length : '';
     $('capIcon').src = icon(f.id); capFind = f;
     $('caption').classList.add('on'); capT = EASY.on ? 20 : 8;
-    autoSay(findText(f));
+    autoSay(findText(f), rec('find-' + f.id.toLowerCase()));
   }
   var capFind = null;
   $('caption').addEventListener('click', function () { $('caption').classList.remove('on'); capT = 0; });
@@ -409,7 +409,7 @@
   }
   function stopMoving() { input.x = input.y = 0; input.keys = {}; P.target = null; stick.on = false; $('stick').style.display = 'none'; }
   ['menuClose', 'poemClose', 'poemDone', 'journalClose', 'doneClose', 'mapClose', 'studioClose', 'studioDone'].forEach(function (id) { $(id).addEventListener('click', closeModal); });
-  $('doneSay').addEventListener('click', function () { say(poemText(PKWaterFinds.OPENING)); });
+  $('doneSay').addEventListener('click', function () { say(poemText(PKWaterFinds.OPENING), rec('poem-opening')); });
   ['menu', 'poemVeil', 'journalVeil', 'doneVeil', 'mapVeil', 'studioVeil', 'photoVeil'].forEach(function (id) { $(id).addEventListener('click', function (e) { if (e.target === $(id)) closeModal(); }); });
 
   var currentPoem = null;
@@ -432,6 +432,7 @@
       var items = FINDS.filter(function (f) { return f.coll === col.id; }), got = items.filter(have).length;
       var d = document.createElement('details'); d.className = 'jcoll' + (got === items.length ? ' full' : '');
       d.innerHTML = '<summary><b>' + esc(col.title) + '</b><span>' + got + ' of ' + items.length + '</span></summary><p class="jline">“' + esc(col.line.replace(/^“|”$/g, '')) + '” <em>' + esc(col.by) + '</em></p>' + (boxDone(col) ? boxPoemHTML(col) : '');
+      d.addEventListener('toggle', function () { if (d.open && save.voice) { var cs = rec('card-' + col.id); if (cs) speak([[null, cs]]); } });
       var ul = document.createElement('ul'); ul.className = 'jlist';
       items.forEach(function (f) {
         var li = document.createElement('li'), g = have(f); li.className = g ? '' : 'no';
@@ -485,7 +486,7 @@
     });
     oc.appendChild(ou); root.appendChild(oc);
   }
-  function openDone() { var pg = $('donePage'); pg.innerHTML = ''; fillPoem(pg, PKWaterFinds.OPENING); openModal('doneVeil'); SFX.done(); autoSay('Every box is full. ' + poemText(PKWaterFinds.OPENING)); }
+  function openDone() { var pg = $('donePage'); pg.innerHTML = ''; fillPoem(pg, PKWaterFinds.OPENING); openModal('doneVeil'); SFX.done(); autoSay([['Every box is full.', rec('line-every-box-full')], [poemText(PKWaterFinds.OPENING), rec('poem-opening')]]); }
 
   // ---------------------------------------------------------------- pictures of the finds: each prop drawn once through the pixel pass
   var ICON = { cache: {}, scene: null };
@@ -550,7 +551,7 @@
     if (newly.length) SFX.page();
     openModal('studioVeil'); checkDone();
     var filled = COLLS.filter(function (col) { return !wasFull[col.id] && boxDone(col) && PKWaterFinds.BOX_POEMS[col.id]; });
-    if (filled.length) autoSay(filled.map(function (col) { return 'The ' + col.title + ' box is full. ' + poemText(PKWaterFinds.BOX_POEMS[col.id]); }).join(' '));
+    if (filled.length) autoSay(filled.map(function (col) { return ['The ' + col.title.replace(/^The /, '') + ' box is full. ' + poemText(PKWaterFinds.BOX_POEMS[col.id]), rec('box-' + col.id)]; }));
   }
   function boxPoemHTML(col) { var pm = PKWaterFinds.BOX_POEMS[col.id]; if (!pm) return ''; return '<div class="gpoem">' + pm.lines.map(function (l) { return '<span>' + esc(l) + '</span>'; }).join('') + '<em>by ' + esc(pm.by) + '</em></div>'; }
   function nearStudio() { var s = world.spots.studio; return Math.hypot(s.x - P.x, s.z - P.z) < 1.8; }
@@ -852,7 +853,7 @@
     if (!SOLIDP) return; SOLIDP.t -= dt; if (SOLIDP.t > 0 || modal || PHOTO.on) return;
     var pm = SOLIDP.pm; SOLIDP = null;
     P.target = null; P.speed = 0; P.lock = 'read'; setAnim('hold-item', 0.25);
-    SFX.page(); poemPage(pm); openModal('poemVeil'); autoSay(poemText(pm), pm.audio);
+    SFX.page(); poemPage(pm); openModal('poemVeil'); autoSay(poemText(pm), poemRec(pm));
   }
   function read(pm) {
     var o = poemObj[pm.id];
@@ -860,7 +861,7 @@
     P.yaw = o.face; king.setItem(null); setAnim('hold-item', 0.25);
     var first = !save.read[pm.id]; save.read[pm.id] = true; persist(); counts();
     SFX.page(); poemPage(pm);
-    openModal('poemVeil'); autoSay(poemText(pm), pm.audio); if (first) checkDone();
+    openModal('poemVeil'); autoSay(poemText(pm), poemRec(pm)); if (first) checkDone();
   }
   function checkDone() {
     var c = counts();
@@ -1312,22 +1313,54 @@
     return vs[0];
   }
   try { if ('speechSynthesis' in window) { VOICE.voice = pickVoice(); speechSynthesis.onvoiceschanged = function () { VOICE.voice = pickVoice(); }; } } catch (e) {}
-  function hush() { VOICE.busy = false; try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {} if (VOICE.audio) { try { VOICE.audio.pause(); } catch (e) {} VOICE.audio = null; } }
-  function say(text, audio) {
-    hush();
-    if (audio) { try { VOICE.audio = new Audio(audio); var pr = VOICE.audio.play(); if (pr && pr.catch) pr.catch(function () {}); return true; } catch (e) {} }
-    if (!text || !('speechSynthesis' in window)) return false;
-    try { var u = new SpeechSynthesisUtterance(text); VOICE.busy = true; u.onend = u.onerror = function () { VOICE.busy = false; }; if (VOICE.voice) { u.voice = VOICE.voice; u.lang = VOICE.voice.lang; } else u.lang = 'en-US'; u.rate = EASY.on ? 0.8 : 0.9; u.pitch = 0.92; speechSynthesis.speak(u); return true; } catch (e) { return false; }
+  // The recorded voice (Nov 18): build.py lists every MP3 in voice/ as window.WWB_VOICE. A line is spoken from its recording where there
+  // is one, and by the computer voice where there is not. rec('find-stick') is that recording, if it is there; recFor(words) finds a
+  // recording by the words themselves (the short lines, the Watch lines and the on-screen notes are matched this way).
+  var REC = window.WWB_VOICE || { files: {}, text: {} }; VOICE.bad = {}; VOICE.run = 0; VOICE.chain = false;
+  function vnorm(t) { return String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+  function rec(stem) { return stem && REC.files[stem] && !VOICE.bad[stem] ? 'voice/' + stem + '.mp3' : null; }
+  function recFor(text) { return text ? rec(REC.text[vnorm(text)]) : null; }
+  function hush() { VOICE.run++; VOICE.busy = false; VOICE.chain = false; try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {} if (VOICE.audio) { try { VOICE.audio.pause(); } catch (e) {} VOICE.audio = null; } }
+  function tts(text, done) {
+    if (!text || !('speechSynthesis' in window)) { done(); return false; }
+    try { var u = new SpeechSynthesisUtterance(text); VOICE.busy = true; u.onend = u.onerror = function () { VOICE.busy = false; done(); }; if (VOICE.voice) { u.voice = VOICE.voice; u.lang = VOICE.voice.lang; } else u.lang = 'en-US'; u.rate = EASY.on ? 0.8 : 0.9; u.pitch = 0.92; speechSynthesis.speak(u); return true; } catch (e) { VOICE.busy = false; done(); return false; }
   }
+  // speak a run of parts, one after another: [[words, recording], ...]. Neighbouring parts with no recording are read as one by the computer voice.
+  function speak(parts) {
+    hush(); var run = VOICE.run, list = [], i = 0;
+    parts.forEach(function (p) { if (!p) return; var src = p[1] || recFor(p[0]), last = list[list.length - 1]; if (!src && !p[0]) return; if (!src && last && !last[1]) last[0] += ' ' + p[0]; else list.push([p[0], src]); });
+    if (!list.length) return false; VOICE.chain = true;
+    function next() {
+      if (run !== VOICE.run) return; if (i >= list.length) { VOICE.chain = false; VOICE.audio = null; return; }
+      var p = list[i++]; if (!p[1]) { tts(p[0], next); return; }
+      var au, fell = false; function fall() { if (fell || run !== VOICE.run) return; fell = true; VOICE.audio = null; tts(p[0], next); }   // a recording that will not play falls back to the computer voice
+      try { au = new Audio(p[1]); } catch (e) { fall(); return; }
+      VOICE.audio = au; au.onended = function () { if (run === VOICE.run) next(); }; au.onerror = fall; var pr = au.play(); if (pr && pr.catch) pr.catch(fall);
+    }
+    next(); return true;
+  }
+  function say(text, audio) { return speak(typeof text === 'string' || !text ? [[text, audio]] : text); }
   function autoSay(text, audio) { if (save.voice || (WATCH && WATCH.on)) say(text, audio); }
+  // the back of the character card: Starworship is read when the card is turned over, if reading aloud is on
+  (function () { var tb = $('cardTurn'), bk = $('cardTurnBack'), cl = $('cardClose'); if (!tb) return;
+    tb.addEventListener('click', function () { if (save.voice) { var cs = rec('poem-starworship'); if (cs) speak([[null, cs]]); } });
+    [bk, cl].forEach(function (b) { if (b) b.addEventListener('click', function () { if (VOICE.audio && /poem-starworship/.test(VOICE.audio.src)) hush(); }); });
+  })();
+  // which recording goes with a poem page
+  function poemRec(pm) {
+    var F = PKWaterFinds; if (!pm) return null; if (pm.audio) return pm.audio;
+    if (pm === F.ENDING) return rec('poem-ending'); if (pm === F.OPENING) return rec('poem-opening');
+    for (var k in F.SOLID_POEMS) if (F.SOLID_POEMS[k] === pm) return rec('poem-solid-' + k);
+    return pm.id ? rec('poem-' + pm.id) : null;
+  }
   // read aloud: the title, who wrote it (and who put it into English), then the lines, a pause at the end of each
   function poemText(pm) { return (pm.title ? pm.title + '. ' : '') + (pm.lines.length ? (pm.anon ? 'From ' : 'By ') + pm.by + (pm.tr ? ', translated by ' + pm.tr : '') + '. ' + pm.lines.filter(Boolean).map(function (l) { return /[.,;:!?\u2014-]$/.test(l) ? l : l + ','; }).join(' ') : 'This page is kept for a poem by ' + pm.by + '.'); }
   function findText(f) { return f.name + '. ' + (f.tag ? f.tag + ' ' : '') + f.caption; }
   function setVoice(on) { save.voice = !!on; persist(); if (!on) hush(); [].forEach.call($('segVoice').children, function (b) { b.setAttribute('aria-pressed', (b.dataset.v === 'on') === !!on ? 'true' : 'false'); }); }
   [].forEach.call($('segVoice').children, function (b) { b.addEventListener('click', function () { save.voiceSet = true; setVoice(b.dataset.v === 'on'); if (save.voice) say('He will read things out now.'); }); });
   if (!('speechSynthesis' in window)) $('voiceRow').hidden = true;
-  $('capSay').addEventListener('click', function (e) { e.stopPropagation(); if (capFind) say(findText(capFind)); capT = Math.max(capT, 7); });
-  $('poemSay').addEventListener('click', function () { if (currentPoem) say(poemText(currentPoem), currentPoem.audio); });
+  $('capSay').addEventListener('click', function (e) { e.stopPropagation(); if (capFind) say(findText(capFind), rec('find-' + capFind.id.toLowerCase())); capT = Math.max(capT, 7); });
+  $('poemSay').addEventListener('click', function () { if (currentPoem) say(poemText(currentPoem), poemRec(currentPoem)); });
 
   // ---------------------------------------------------------------- Ponder: he holds up his wooden icosahedron and the valley answers a little
   var PON = { i: Math.floor(Math.random() * 9), n: 0, t: 0, shimmer: [], card: 0, text: '' };
@@ -1343,7 +1376,9 @@
     if (now.length) {
       var best = null, bd = 1e9; now.forEach(function (f) { var o = findObj[f.id], d = Math.hypot(o.x - P.x, o.z - P.z); if (d < bd) { bd = d; best = f; } });
       var o = findObj[best.id], far = bd < 10 ? 'close by' : bd < 35 ? 'not far off' : 'a long way off';
-      return 'Something with ' + FACES[best.id] + ' answers, ' + far + (bd < 4 ? '.' : ', to the ' + compass(o.x - P.x, o.z - P.z) + '.');
+      var cmp = compass(o.x - P.x, o.z - P.z), farKey = far === 'close by' ? 'close' : far === 'not far off' ? 'not-far' : 'long-way';
+      PON.hintParts = [['Something with ' + FACES[best.id] + ' answers,', rec('ponder-faces-' + best.id)]].concat(bd < 4 ? [['close by.', rec('ponder-far-close-end')]] : [[far + ',', rec('ponder-far-' + farKey)], ['to the ' + cmp + '.', rec('ponder-dir-' + cmp)]]);
+      return 'Something with ' + FACES[best.id] + ' answers, ' + far + (bd < 4 ? '.' : ', to the ' + cmp + '.');
     }
     var w2 = left.filter(function (f) { return f.wave === 2 && save.wave < 2; }).length;
     if (w2) return w2 > 1 ? 'Two of the shapes are still up the valley somewhere, waiting for the next storm to bring them down.' : 'One of the shapes is waiting for the next storm.';
@@ -1359,13 +1394,16 @@
     PON.shimmer.forEach(function (o) { if (o.beam) o.beam.visible = false; });
     PON.shimmer = []; ITEMS.forEach(function (f) { if (!available(f)) return; var o = findObj[f.id], d = Math.hypot(o.x - P.x, o.z - P.z); if (d < (f.coll === 'solids' ? 60 : 16)) PON.shimmer.push(o); });
     PON.t = 7;
-    var hint = ponderHint();
+    PON.hintParts = null; var hint = ponderHint();
     $('ponNote').textContent = note + (hint ? ' ' + hint : '');
     $('ponLine').textContent = '“' + q.line + '”'; $('ponBy').textContent = q.by;
     $('toast').classList.remove('on'); toastT = 0; $('caption').classList.remove('on'); capT = 0;
     $('ponder').classList.add('on'); PON.card = 10;
     PON.text = note + ' ' + (hint ? hint + ' ' : '') + q.line + ' ' + q.by + '.';
-    SFX.ponder(); autoSay(PON.text);
+    // the commonplace line's recording is found by how the line begins (the recording goes on to say whose it is)
+    var qk = vnorm(q.line), qStem = null; for (var tk in REC.text) if (/^ponder-line-/.test(REC.text[tk]) && tk.indexOf(qk) === 0) { qStem = REC.text[tk]; break; }
+    PON.parts = [[note, null]].concat(hint ? (PON.hintParts || [[hint, null]]) : []).concat([[q.line + ' ' + q.by + '.', rec(qStem)]]);
+    SFX.ponder(); autoSay(PON.parts);
   }
   function ponderUpdate(dt) {
     if (PON.card > 0) { PON.card -= dt; if (PON.card <= 0) $('ponder').classList.remove('on'); }
@@ -1377,7 +1415,7 @@
     });
   }
   $('ponder').addEventListener('click', function () { $('ponder').classList.remove('on'); PON.card = 0; });
-  $('ponSay').addEventListener('click', function (e) { e.stopPropagation(); say(PON.text); PON.card = Math.max(PON.card, 8); });
+  $('ponSay').addEventListener('click', function (e) { e.stopPropagation(); say(PON.parts || PON.text); PON.card = Math.max(PON.card, 8); });
   $('bPonder').addEventListener('click', function () { ponder(); });
 
   // ---------------------------------------------------------------- photo mode: pose him, crown on or off, turn the view, take the picture
@@ -1597,7 +1635,7 @@
     // 9 - 20: the shadow theatre
     if (t >= 9 && t < 26) { SH.mesh.visible = FIRE.amt > 0.3; if (SH.mesh.visible) drawShadows(t - 9); }
     if (t >= 9 && once('sh')) { SH.mesh.visible = true; }
-    if (t >= 15.6 && once('cave')) { cineText(PKWaterFinds.CAVE_LINE.line, PKWaterFinds.CAVE_LINE.by); autoSay(PKWaterFinds.CAVE_LINE.line); }
+    if (t >= 15.6 && once('cave')) { cineText(PKWaterFinds.CAVE_LINE.line, PKWaterFinds.CAVE_LINE.by); autoSay(PKWaterFinds.CAVE_LINE.line, rec('ending-cave')); }
     // 20.2 - 21.4: he turns round, toward the light
     if (t >= 20.2 && t < 21.4) { var tu = (t - 20.2) / 1.2; P.yaw = Math.PI - 0.15 + (Math.PI + 0.15) * tu * tu * (3 - 2 * tu); if (once('turn')) cineText(''); }
     // 21.4 - 28: out of the cave into the morning; the camera follows him, the fire goes down, the night runs out
@@ -1611,14 +1649,14 @@
       var dn = Math.min(1, (t - 21.4) / 6.5); SKY.hour = ENDING.night + (ENDING.dawn - ENDING.night) * dn * dn * (3 - 2 * dn);
       if (t >= 25.2 && FIRE.amt < 0.32) SH.mesh.visible = false;
     }
-    if (t >= 26.6 && once('dawn')) { cineText(PKWaterFinds.DAWN_LINE.line, PKWaterFinds.DAWN_LINE.by); autoSay(PKWaterFinds.DAWN_LINE.line); }
+    if (t >= 26.6 && once('dawn')) { cineText(PKWaterFinds.DAWN_LINE.line, PKWaterFinds.DAWN_LINE.by); autoSay(PKWaterFinds.DAWN_LINE.line, rec('ending-dawn')); }
     // the teal come over, low and quick, against the sunrise, and turn; the poem, a stanza at a time; on the last, a small wave
     if (t >= 32.6 && once('teal')) { life.flyOver(tealPath(), 22); ENDING.st = { i: -1, t: 0, min: 0 }; }
     if (ENDING.st) {
       var S = ENDING.st; S.t += dt;
       if (S.i < 0 || (S.t > S.min && (!speechBusy() || S.t > S.min + 16))) {
         S.i++; S.t = 0;
-        if (S.i < TEALS.length) { cineText(TEALS[S.i], PKWaterFinds.TEAL.title + ' \u00b7 by ' + PKWaterFinds.TEAL.by); autoSay(TEALS[S.i].replace(/\n/g, ' ')); S.min = Math.max(7, TEALS[S.i].split(/\s+/).length / 3.0 + 2); if (S.i === TEALS.length - 1) ENDING.waveAt = t + 3.2; }
+        if (S.i < TEALS.length) { cineText(TEALS[S.i], PKWaterFinds.TEAL.title + ' \u00b7 by ' + PKWaterFinds.TEAL.by); autoSay(TEALS[S.i].replace(/\n/g, ' '), rec('ending-teal-' + (S.i + 1))); S.min = Math.max(7, TEALS[S.i].split(/\s+/).length / 3.0 + 2); if (S.i === TEALS.length - 1) ENDING.waveAt = t + 3.2; }
         else { ENDING.st = null; ENDING.pageAt = t + 2.2; cineText(''); }
       }
     }
@@ -1648,7 +1686,7 @@
     finishEnding(false);
     var pm = PKWaterFinds.ENDING; currentPoem = pm;
     $('ePage').innerHTML = ''; fillPoem($('ePage'), pm); $('eTitle').textContent = pm.title || 'The last page'; $('eBy').textContent = byLine(pm);
-    openModal('endVeil'); SFX.page(); autoSay(poemText(pm), pm.audio);
+    openModal('endVeil'); SFX.page(); autoSay(poemText(pm), poemRec(pm));
   }
   // 'by Horace · translated by John Conington'; under the poem, where it comes from (pm.src) and, if there is one, a line about it (pm.note)
   function byLine(pm) { return (pm.anon ? 'from ' : 'by ') + pm.by + (pm.tr ? ' \u00b7 translated by ' + pm.tr : ''); }
@@ -1678,7 +1716,7 @@
     setTimeout(function () { toast('The five solids stay on the ledge. The creek, as usual, has more to bring.', 5); }, 600);
   }
   $('bSkip').addEventListener('click', function () { if (!ENDING.on) return; finishEnding(true); endingPage(); });
-  $('eSay').addEventListener('click', function () { var pm = PKWaterFinds.ENDING; say(poemText(pm), pm.audio); });
+  $('eSay').addEventListener('click', function () { var pm = PKWaterFinds.ENDING; say(poemText(pm), poemRec(pm)); });
   $('eNext').addEventListener('click', function () { hush(); credits(); });
   $('creditsDone').addEventListener('click', function () { closeModal(); endEnding(); if (WATCH.on) watchStop(); });
   $('creditsVeil').addEventListener('click', function (e) { if (e.target === $('creditsVeil')) { closeModal(); endEnding(); } });
@@ -2112,7 +2150,7 @@
   function watchSkip() { if (!WATCH.on) return; hush(); chapter(null); if (GUIDE.route) guideStop(); if (modal && modal !== 'endVeil' && modal !== 'creditsVeil') closeModal(); WATCH.phase = 'next'; }
   // the big chapter card in the middle of the screen
   function chapter(title, sub) { var c = $('chapter'); if (!title) { c.classList.remove('on'); return; } $('chTitle').textContent = title; $('chSub').textContent = sub || ''; c.classList.remove('on'); void c.offsetWidth; c.classList.add('on'); }
-  function speechBusy() { var tts = false; try { tts = VOICE.busy && ('speechSynthesis' in window) && (speechSynthesis.speaking || speechSynthesis.pending); } catch (e) {} return tts || !!(VOICE.audio && !VOICE.audio.paused && !VOICE.audio.ended); }
+  function speechBusy() { if (VOICE.chain) return true; var tts = false; try { tts = VOICE.busy && ('speechSynthesis' in window) && (speechSynthesis.speaking || speechSynthesis.pending); } catch (e) {} return tts || !!(VOICE.audio && !VOICE.audio.paused && !VOICE.audio.ended); }
   function waiting() { return WATCH.t < WATCH.min || (speechBusy() && WATCH.t < WATCH.min * 2.5 + 6); }   // never wait for a voice for ever
   function readTime(t) { return 1.5 + (t ? t.split(/\s+/).length / 2.4 : 0); }   // how long a line takes, when there is no voice to listen for
   function storyGoal(st) {
@@ -2387,7 +2425,7 @@
     step: function (sec, fps) { var h = 1 / (fps || 30); for (var t = 0; t < sec - 1e-6; t += h) update(h); render(); },
     tick: function (sec, fps) { var h = 1 / (fps || 30); for (var t = 0; t < sec - 1e-6; t += h) update(h); },
     render: render, openMap: openMap, reveal: reveal, blocked: blocked, sky: SKY, rest: function (seatId, target) { restSeat = SEATS.filter(function (q) { return q.id === seatId; })[0] || { x: P.x, z: P.z, y: P.y, face: P.yaw, label: 'here' }; rest(target); }, seats: SEATS, startStorm: function () { startStorm(); }, endStorm: function () { endStorm(); }, setHour: function (h) { SKY.hour = h; save.hour = h; }, openStudio: openStudio, journal: function () { journal(); openModal('journalVeil'); }, icon: icon, findObj: findObj, available: available, pickUp: pickUp, setWave: function (w) { save.wave = w; showFinds(); }, items: ITEMS,
-    closeUp: closeUp, tilt: tilt, resetView: resetView, music: MUS, musicSets: SETS, musicScene: musicScene, skips: SKIPS, stone: STONE, skipStone: skipStone, nearSkip: nearSkip, noteSeen: noteSeen, field: FIELD, amb: AMB,
+    closeUp: closeUp, tilt: tilt, resetView: resetView, music: MUS, musicSets: SETS, voiceState: VOICE, rec: rec, recFor: recFor, speak: speak, poemRec: poemRec, speechBusy: speechBusy, musicScene: musicScene, skips: SKIPS, stone: STONE, skipStone: skipStone, nearSkip: nearSkip, noteSeen: noteSeen, field: FIELD, amb: AMB,
     ponder: ponder, say: say, voice: setVoice, PON: PON, easy: setEasy, EASY: EASY,
     watch: { start: watchStart, stop: watchStop, pause: watchPause, skip: watchSkip, state: WATCH, story: STORY },
     guide: { go: guideGo, stop: guideStop, plan: planRoute, next: nextGoal, state: GUIDE, nav: function () { if (!NAV) buildNav(); return NAV; }, lineOK: lineOK },

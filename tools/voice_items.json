@@ -1,0 +1,1028 @@
+[
+{
+"n": 1,
+"stem": "find-glassg",
+"ctx": "He picks it up (Things the Water Rounded)",
+"text": "Green creek glass. Bottle glass, frosted by the creek. Once a bottle, now a pebble with a past. The creek is patient with sharp things."
+},
+{
+"n": 2,
+"stem": "find-marble",
+"ctx": "He picks it up (Things the Water Rounded)",
+"text": "Clay marble. Fired clay, rolled by hand, perhaps 1920. Somebody lost at marbles here, a long time ago. The creek kept score."
+},
+{
+"n": 3,
+"stem": "find-brick",
+"ctx": "He picks it up (Things the Water Rounded)",
+"text": "Brick, worn round. Red brick; the maker’s stamp worn away. A brick that has forgotten it was ever square."
+},
+{
+"n": 4,
+"stem": "find-quartz",
+"ctx": "He picks it up (Things the Water Rounded)",
+"text": "White quartz pebble. Milky quartz. It holds the light the way a breath is held."
+},
+{
+"n": 5,
+"stem": "find-golf",
+"ctx": "He picks it up (Things the Water Rounded)",
+"text": "Golf ball. Rubber core, the dimples nearly gone. No golf course for miles. Somebody hit a very ambitious shot."
+},
+{
+"n": 6,
+"stem": "find-knob",
+"ctx": "He picks it up (Things the Water Rounded)",
+"text": "Porcelain doorknob. White porcelain; the spindle rusted off. A door to nowhere in particular. He tries it anyway, out of courtesy."
+},
+{
+"n": 7,
+"stem": "find-key",
+"ctx": "He picks it up (Rust)",
+"text": "Skeleton key. Iron; the bit worn thin. It opens something. That is all a key ever promises."
+},
+{
+"n": 8,
+"stem": "find-horseshoe",
+"ctx": "He picks it up (Rust)",
+"text": "Horseshoe. Iron, six nail holes. Hung one way it holds luck in. Lying in the mud, it has held a little mud."
+},
+{
+"n": 9,
+"stem": "find-spike",
+"ctx": "He picks it up (Rust)",
+"text": "Railroad spike. Iron, hand forged. Driven in about a century ago, and pried out by nobody in particular."
+},
+{
+"n": 10,
+"stem": "find-cap",
+"ctx": "He picks it up (Rust)",
+"text": "Bottle cap. Tin; the paint long gone. Somebody’s root beer, 1962, give or take."
+},
+{
+"n": 11,
+"stem": "find-car",
+"ctx": "He picks it up (Rust)",
+"text": "Tin toy car. Pressed tin, one wheel left. It has been to the end of the culvert and back, which is further than most cars go."
+},
+{
+"n": 12,
+"stem": "find-spoon",
+"ctx": "He picks it up (Rust)",
+"text": "Rusted spoon. Iron, bent at the neck. For soup, once. Now for nothing at all, which is its own kind of rest."
+},
+{
+"n": 13,
+"stem": "find-feather",
+"ctx": "He picks it up (Bones and Feathers)",
+"text": "Heron feather. Great blue heron, a covert feather. A long grey feather. The heron has more, and does not seem to miss this one."
+},
+{
+"n": 14,
+"stem": "find-hawk",
+"ctx": "He picks it up (Bones and Feathers)",
+"text": "Hawk feather. Red-tailed hawk, a tail feather. From up here the hawk sees everything. It dropped this to prove it."
+},
+{
+"n": 15,
+"stem": "find-shell",
+"ctx": "He picks it up (Bones and Feathers)",
+"text": "Turtle shell. Red-eared slider, long empty. A house, outgrown in the only way a turtle can outgrow one."
+},
+{
+"n": 16,
+"stem": "find-snakeskin",
+"ctx": "He picks it up (Bones and Feathers)",
+"text": "Snake skin. Rat snake, shed whole, inside out. A whole snake’s worth of skin, and no snake. Even snakes start over."
+},
+{
+"n": 17,
+"stem": "find-vertebra",
+"ctx": "He picks it up (Bones and Feathers)",
+"text": "Deer vertebra. White-tailed deer. One bone of a back that carried a deer a long way."
+},
+{
+"n": 18,
+"stem": "find-skull",
+"ctx": "He picks it up (Bones and Feathers)",
+"text": "Bird skull. Small; probably a cardinal. As light as a thought, and about the same shape."
+},
+{
+"n": 19,
+"stem": "find-ammonite",
+"ctx": "He picks it up (The Old Sea)",
+"text": "Ammonite. Cretaceous, about 95 million years. A stone spiral from the days when all of Texas was sea floor. It has kept its shape a long time."
+},
+{
+"n": 20,
+"stem": "find-tooth",
+"ctx": "He picks it up (The Old Sea)",
+"text": "Shark tooth. Cretaceous shark, about 90 million years. Texas was a warm sea then. The shark did not know about Texas."
+},
+{
+"n": 21,
+"stem": "find-oyster",
+"ctx": "He picks it up (The Old Sea)",
+"text": "Fossil oyster. Texigryphaea, the “devil’s toenail”. The old people called it the devil’s toenail. The devil has never been seen to miss it."
+},
+{
+"n": 22,
+"stem": "find-urchin",
+"ctx": "He picks it up (The Old Sea)",
+"text": "Fossil sea urchin. A heart urchin, five-petalled. A five-petalled flower in stone, from the bottom of the sea."
+},
+{
+"n": 23,
+"stem": "find-clam",
+"ctx": "He picks it up (The Old Sea)",
+"text": "Fossil clam. Inoceramus, a piece of a giant clam. A piece of a clam as big as a hubcap. The rest of it is somewhere under the county."
+},
+{
+"n": 24,
+"stem": "find-fishbone",
+"ctx": "He picks it up (The Old Sea)",
+"text": "Fossil fish bone. A fish vertebra, turned to stone. A fish that swam over this exact spot, when the spot was ninety feet down."
+},
+{
+"n": 25,
+"stem": "find-soldier",
+"ctx": "He picks it up (Lost Toys)",
+"text": "Tin soldier. Lead, the paint mostly gone. He has held his post through every flood. Nobody told him the war was over."
+},
+{
+"n": 26,
+"stem": "find-doll",
+"ctx": "He picks it up (Lost Toys)",
+"text": "Doll’s hand. Bisque porcelain. Waving, or reaching. It is hard to say which, and perhaps it does not matter."
+},
+{
+"n": 27,
+"stem": "find-duck",
+"ctx": "He picks it up (Lost Toys)",
+"text": "Rubber duck. Yellow rubber, sun-faded. It has come a long way down a lot of water, and does not look worried."
+},
+{
+"n": 28,
+"stem": "find-domino",
+"ctx": "He picks it up (Lost Toys)",
+"text": "Domino. Double five, bone and ebony. Double five. He looks for the rest of the set, briefly, and then lets it go."
+},
+{
+"n": 29,
+"stem": "find-dino",
+"ctx": "He picks it up (Lost Toys)",
+"text": "Toy dinosaur. Green plastic: a stegosaurus. A stegosaurus in a creek older than stegosauruses. It seems to know."
+},
+{
+"n": 30,
+"stem": "find-die",
+"ctx": "He picks it up (Lost Toys)",
+"text": "Six-sided die. Bone, worn soft at the corners. Six faces. He thinks of the icosahedron, which has twenty, and so has more to say."
+},
+{
+"n": 31,
+"stem": "find-bottle",
+"ctx": "He picks it up (Glass and Light)",
+"text": "Bottle with a tiny king. Clear glass, cork stopper, one small king. A bottle with a very small king inside. He looks content. Perhaps that is the trick."
+},
+{
+"n": 32,
+"stem": "find-medicine",
+"ctx": "He picks it up (Glass and Light)",
+"text": "Blue medicine bottle. Cobalt glass, a druggist’s bottle. Cobalt blue, the colour druggists chose so nobody would mistake it for anything else."
+},
+{
+"n": 33,
+"stem": "find-tealglass",
+"ctx": "He picks it up (Glass and Light)",
+"text": "Teal glass. Old glass, a deep teal. Rare. The colour of the branch, the colour of the duck: a colour with a name in it."
+},
+{
+"n": 34,
+"stem": "find-insulator",
+"ctx": "He picks it up (Glass and Light)",
+"text": "Glass insulator. Aqua glass, from the old telegraph line. It carried messages once, without ever reading them. A discreet object."
+},
+{
+"n": 35,
+"stem": "find-crystal",
+"ctx": "He picks it up (Glass and Light)",
+"text": "Chandelier crystal. Cut glass, a teardrop. It throws small rainbows on his sleeve. Nobody asked it to."
+},
+{
+"n": 36,
+"stem": "find-amber",
+"ctx": "He picks it up (Glass and Light)",
+"text": "Amber bottle. Brown glass, the label long gone. A bottle the colour of strong tea, and of the pond at evening."
+},
+{
+"n": 37,
+"stem": "find-walden",
+"ctx": "He picks it up (Pages)",
+"text": "A copy of Walden. Paperback, swollen with creek water. Somebody came here to read, and forgot to go home."
+},
+{
+"n": 38,
+"stem": "find-postcard",
+"ctx": "He picks it up (Pages)",
+"text": "Postcard. A postcard of the Gulf; the message washed away. Wish you were here, presumably. The water kept the rest."
+},
+{
+"n": 39,
+"stem": "find-card",
+"ctx": "He picks it up (Pages)",
+"text": "Library card. Long overdue. Somewhere a librarian is still waiting, kindly."
+},
+{
+"n": 40,
+"stem": "find-dictpage",
+"ctx": "He picks it up (Pages)",
+"text": "Dictionary page. A page from W to Wh, with “wonder” circled. Somebody circled “wonder”. He agrees with the choice."
+},
+{
+"n": 41,
+"stem": "find-letter",
+"ctx": "He picks it up (Pages)",
+"text": "Letter in a bottle. A letter, too faded to read. He does not try to read it. Some letters are for the reading, and some only for the sending."
+},
+{
+"n": 42,
+"stem": "find-pencil",
+"ctx": "He picks it up (Pages)",
+"text": "Pencil stub. Cedar, chewed at the end. Someone sat here and wrote something down. The pencil stayed for the next one."
+},
+{
+"n": 43,
+"stem": "find-bowl",
+"ctx": "He picks it up (Seeds and Wood)",
+"text": "Wooden bowl. Turned wood, worn smooth. Just the right size to hold a question."
+},
+{
+"n": 44,
+"stem": "find-sycball",
+"ctx": "He picks it up (Seeds and Wood)",
+"text": "Sycamore ball. The seed ball of an American sycamore. A small round world, packed with tomorrows."
+},
+{
+"n": 45,
+"stem": "find-horseapple",
+"ctx": "He picks it up (Seeds and Wood)",
+"text": "Horse apple. The fruit of the bois d’arc. Nothing eats it, and nothing much can. It is green and lumpy and entirely itself."
+},
+{
+"n": 46,
+"stem": "find-pecan",
+"ctx": "He picks it up (Seeds and Wood)",
+"text": "Pecan. The state tree’s nut. The state tree of Texas, and the squirrels’ business."
+},
+{
+"n": 47,
+"stem": "find-acorn",
+"ctx": "He picks it up (Seeds and Wood)",
+"text": "Acorn cap. A bur oak cap, empty. A little cap without its acorn. The acorn has gone off to be an oak."
+},
+{
+"n": 48,
+"stem": "find-drift",
+"ctx": "He picks it up (Seeds and Wood)",
+"text": "Driftwood twist. Cedar, turned by water. The water carved it slowly, without a plan. Tom would hang it on the wall."
+},
+{
+"n": 49,
+"stem": "find-icosa",
+"ctx": "He picks it up (The Five Solids)",
+"text": "Icosahedron. Twenty faces. Plato’s water. Twenty faces, and not one of them pretends to be round. Plato built water out of these."
+},
+{
+"n": 50,
+"stem": "find-octa",
+"ctx": "He picks it up (The Five Solids)",
+"text": "Octahedron. Eight faces. Plato’s air. Found where the wind is. Eight faces, and all of them looking up."
+},
+{
+"n": 51,
+"stem": "find-cube",
+"ctx": "He picks it up (The Five Solids)",
+"text": "Pyrite cube. Pyrite grows in cubes. Plato’s earth. Fool’s gold, the miners said. But nobody who found a perfect cube in the mud was a fool."
+},
+{
+"n": 52,
+"stem": "find-tetra",
+"ctx": "He picks it up (The Five Solids)",
+"text": "Tetrahedron. Four faces. Plato’s fire. Four faces, warm still from the lightning. Fire is the sharpest of the shapes."
+},
+{
+"n": 53,
+"stem": "find-dodeca",
+"ctx": "He picks it up (The Five Solids)",
+"text": "Dodecahedron. Twelve faces. Plato’s heavens. Twelve faces, for the whole sky. It only shows itself when the stars are out."
+},
+{
+"n": 54,
+"stem": "find-stick",
+"ctx": "He picks it up (a tool)",
+"text": "A walking stick. A good straight stick. With it he can lean against water that is running hard."
+},
+{
+"n": 55,
+"stem": "find-waders",
+"ctx": "He picks it up (a tool)",
+"text": "Tom’s waders. Rubber waders, patched at the knee. Now the deep pools are his too."
+},
+{
+"n": 56,
+"stem": "find-lantern",
+"ctx": "He picks it up (a tool)",
+"text": "A lantern. An old brass lantern. The night will be a little smaller now."
+},
+{
+"n": 57,
+"stem": "poem-bench",
+"ctx": "The bench",
+"text": "Sit down by this pine.\\\nBy Plato, translated by W. R. Paton.\n\nSit down by this high-foliaged vocal pine that quivers in the constant western breeze, and beside my plashing stream Pan’s pipe shall bring slumber to thy charmed eyelids."
+},
+{
+"n": 58,
+"stem": "poem-heron",
+"ctx": "The Heron Pool",
+"text": "Mist.\\\nBy Henry David Thoreau.\n\nLow-anchored cloud,\\\nNewfoundland air,\\\nFountain-head and source of rivers,\\\nDew-cloth, dream drapery,\\\nAnd napkin spread by fays;\\\nDrifting meadow of the air,\\\nWhere bloom the daisied banks and violets,\\\nAnd in whose fenny labyrinth\\\nThe bittern booms and heron wades;\\\nSpirit of lakes and seas and rivers,\\\nBear only perfumes and the scent\\\nOf healing herbs to just men’s fields!"
+},
+{
+"n": 59,
+"stem": "poem-rock",
+"ctx": "The flat rock",
+"text": "Inversnaid.\\\nBy Gerard Manley Hopkins.\n\nThis darksome burn, horseback brown,\\\nHis rollrock highroad roaring down,\\\nIn coop and in comb the fleece of his foam\\\nFlutes and low to the lake falls home.\n\nA windpuff-bonnet of fáwn-fróth\\\nTurns and twindles over the broth\\\nOf a pool so pitchblack, féll-frówning,\\\nIt rounds and rounds Despair to drowning.\n\nDegged with dew, dappled with dew\\\nAre the groins of the braes that the brook treads through,\\\nWiry heathpacks, flitches of fern,\\\nAnd the beadbonny ash that sits over the burn.\n\nWhat would the world be, once bereft\\\nOf wet and of wildness? Let them be left,\\\nO let them be left, wildness and wet;\\\nLong live the weeds and the wilderness yet."
+},
+{
+"n": 60,
+"stem": "poem-lookout",
+"ctx": "The lookout",
+"text": "I built my hut.\\\nBy T’ao Ch’ien, translated by Arthur Waley.\n\nI built my hut in a zone of human habitation,\\\nYet near me there sounds no noise of horse or coach.\\\nWould you know how that is possible?\\\nA heart that is distant creates a wilderness round it.\\\nI pluck chrysanthemums under the eastern hedge,\\\nThen gaze long at the distant summer hills.\\\nThe mountain air is fresh at the dusk of day:\\\nThe flying birds two by two return.\\\nIn these things there lies a deep meaning;\\\nYet when we would express it, words suddenly fail us."
+},
+{
+"n": 61,
+"stem": "poem-spring",
+"ctx": "The spring",
+"text": "To the Fountain of Bandusia.\\\nBy Horace, translated by John Conington.\n\nBandusia’s fount, in clearness crystalline,\\\nO worthy of the wine, the flowers we vow!\\\nTo-morrow shall be thine\\\nA kid, whose crescent brow\n\nIs sprouting all for love and victory.\\\nIn vain: his warm red blood, so early stirr’d,\\\nThy gelid stream shall dye,\\\nChild of the wanton herd.\n\nThee the fierce Sirian star, to madness fired,\\\nForbears to touch: sweet cool thy waters yield\\\nTo ox with ploughing tired,\\\nAnd lazy sheep afield.\n\nThou too one day shalt win proud eminence\\\n’Mid honour’d founts, while I the ilex sing\\\nCrowning the cavern, whence\\\nThy babbling wavelets spring."
+},
+{
+"n": 62,
+"stem": "poem-oak",
+"ctx": "The old oak",
+"text": "I Saw in Louisiana a Live-Oak Growing.\\\nBy Walt Whitman.\n\nI saw in Louisiana a live-oak growing,\\\nAll alone stood it and the moss hung down from the branches,\\\nWithout any companion it grew there uttering joyous leaves of dark green,\\\nAnd its look, rude, unbending, lusty, made me think of myself,\\\nBut I wonder’d how it could utter joyous leaves standing alone there without its friend near, for I knew I could not,\\\nAnd I broke off a twig with a certain number of leaves upon it, and twined around it a little moss,\\\nAnd brought it away, and I have placed it in sight in my room,\\\nIt is not needed to remind me as of my own dear friends,\\\nFor I believe lately I think of little else than of them,\\\nYet it remains to me a curious token, it makes me think of manly love;\\\nFor all that, and though the live-oak glistens there in Louisiana solitary in a wide flat space,\\\nUttering joyous leaves all its life without a friend a lover near,\\\nI know very well I could not."
+},
+{
+"n": 63,
+"stem": "poem-pond",
+"ctx": "The stock pond",
+"text": "To a Waterfowl.\\\nBy William Cullen Bryant.\n\nWhither, midst falling dew,\\\nWhile glow the heavens with the last steps of day,\\\nFar, through their rosy depths, dost thou pursue\\\nThy solitary way?\n\nVainly the fowler’s eye\\\nMight mark thy distant flight to do thee wrong,\\\nAs, darkly painted on the crimson sky,\\\nThy figure floats along.\n\nSeek’st thou the plashy brink\\\nOf weedy lake, or marge of river wide,\\\nOr where the rocking billows rise and sink\\\nOn the chafed ocean side?\n\nThere is a Power whose care\\\nTeaches thy way along that pathless coast,—\\\nThe desert and illimitable air,—\\\nLone wandering, but not lost.\n\nAll day thy wings have fanned,\\\nAt that far height, the cold, thin atmosphere,\\\nYet stoop not, weary, to the welcome land,\\\nThough the dark night is near.\n\nAnd soon that toil shall end;\\\nSoon shalt thou find a summer home, and rest,\\\nAnd scream among thy fellows; reeds shall bend,\\\nSoon, o’er thy sheltered nest.\n\nThou’rt gone, the abyss of heaven\\\nHath swallowed up thy form; yet, on my heart\\\nDeeply hath sunk the lesson thou hast given,\\\nAnd shall not soon depart.\n\nHe who, from zone to zone,\\\nGuides through the boundless sky thy certain flight,\\\nIn the long way that I must tread alone,\\\nWill lead my steps aright."
+},
+{
+"n": 64,
+"stem": "poem-bridge",
+"ctx": "The footbridge",
+"text": "Fragments.\\\nBy Heraclitus, translated by John Burnet.\n\nYou cannot step twice into the same rivers; for fresh waters are ever flowing in upon you.\n\nWe step and do not step into the same rivers; we are and are not.\n\nThe sun is new every day.\n\nNature loves to hide.\n\nThe way up and the way down is one and the same.\n\nAll things are an exchange for Fire, and Fire for all things, even as wares for gold and gold for wares.\n\nFire lives the death of air, and air lives the death of fire; water lives the death of earth, earth that of water.\n\nEven the posset separates if it is not stirred.\n\nTime is a child playing draughts, the kingly power is a child’s."
+},
+{
+"n": 65,
+"stem": "poem-crossing",
+"ctx": "The low-water crossing",
+"text": "The Flood.\\\nFrom The Epic of Gilgamish, translated by R. Campbell Thompson.\n\nSix days, a se’nnight the hurricane, deluge, and tempest continued\\\nSweeping the land: when the seventh day came, were quelléd the warfare,\\\nTempest and deluge which like to an army embattail’d were fighting.\\\nLull’d was the sea, all spent was the gale, assuaged was the deluge,\\\nSo did I look on the day; lo, sound was all still’d; and all human\\\nBack to its clay was return’d, and fen was level with roof-tree.\\\nThen I open’d a hatchway, and down on my cheek stream’d the sunlight,\\\nBowing myself, I sat weeping, my tears o’er my cheeks overflowing,\\\nInto the distance I gazed, to the furthest bounds of the Ocean,\\\nLand was uprear’d at twelve points, and the Ark on the Mountain of Nisir\\\nGrounded; the Mountain of Nisir held fast, nor gave lease to her shifting.\\\nOne day, nay, two, did Nisir hold fast, nor give lease to her shifting.\\\nThree days, nay, four, did Nisir hold fast, nor give lease to her shifting,\\\nFive days, nay, six, did Nisir hold fast, nor give lease to her shifting.\\\nThen, when the seventh day dawn’d, I put forth a dove, and released her,\\\nBut to and fro went the dove, and return’d for a resting-place was not.\\\nThen I a swallow put forth and released; to and fro went the swallow,\\\nShe too return’d, for a resting-place was not; I put forth a raven,\\\nHer, too, releasing; the raven went, too, and th’ abating of waters\\\nSaw; and she ate as she waded and splash’d, unto me not returning."
+},
+{
+"n": 66,
+"stem": "poem-trestle",
+"ctx": "The trestle",
+"text": "Invocation.\\\nBy Boethius, translated by H. R. James.\n\nMaker of earth and sky, from age to age\\\nWho rul’st the world by reason; at whose word\\\nTime issues from Eternity’s abyss:\\\nTo all that moves the source of movement, fixed\\\nThyself and moveless. Thee no cause impelled\\\nExtrinsic this proportioned frame to shape\\\nFrom shapeless matter; but, deep-set within\\\nThy inmost being, the form of perfect good,\\\nFrom envy free; and Thou didst mould the whole\\\nTo that supernal pattern. Beauteous\\\nThe world in Thee thus imaged, being Thyself\\\nMost beautiful. So Thou the work didst fashion\\\nIn that fair likeness, bidding it put on\\\nPerfection through the exquisite perfectness\\\nOf every part’s contrivance. Thou dost bind\\\nThe elements in balanced harmony,\\\nSo that the hot and cold, the moist and dry,\\\nContend not; nor the pure fire leaping up\\\nEscape, or weight of waters whelm the earth.\n\nThou joinest and diffusest through the whole,\\\nLinking accordantly its several parts,\\\nA soul of threefold nature, moving all.\\\nThis, cleft in twain, and in two circles gathered,\\\nSpeeds in a path that on itself returns,\\\nEncompassing mind’s limits, and conforms\\\nThe heavens to her true semblance. Lesser souls\\\nAnd lesser lives by a like ordinance\\\nThou sendest forth, each to its starry car\\\nAffixing, and dost strew them far and wide\\\nO’er earth and heaven. These by a law benign\\\nThou biddest turn again, and render back\\\nTo thee their fires. Oh, grant, almighty Father,\\\nGrant us on reason’s wing to soar aloft\\\nTo heaven’s exalted height; grant us to see\\\nThe fount of good; grant us, the true light found,\\\nTo fix our steadfast eyes in vision clear\\\nOn Thee. Disperse the heavy mists of earth,\\\nAnd shine in Thine own splendour. For Thou art\\\nThe true serenity and perfect rest\\\nOf every pious soul—to see Thy face,\\\nThe end and the beginning—One the guide,\\\nThe traveller, the pathway, and the goal."
+},
+{
+"n": 67,
+"stem": "poem-bluehole",
+"ctx": "The Blue Hole",
+"text": "Reed and Rush.\\\nFrom The Book of Songs, translated by James Legge.\n\nReed and rush are dark and green;\\\nAs hoarfrost the white dew is seen.\\\nHim, the man I have in mind,\\\nBy this water I should find.\\\nSearching, up the stream I haste,\\\nOn a long and toilsome quest.\\\nDownwards then I turn, and see!\\\nIn the midstream standeth he.\\\nHe is there but far removed;\\\nVain has all my searching proved.\n\nReed and rush luxuriant rise;\\\nStill undried the white dew lies.\\\nHim, the man I have in mind,\\\nOn the stream’s edge I should find.\\\nUpwards first my course I keep,\\\nThough the way is rough and steep.\\\nDownwards then, and what to see?\\\nIn the midstream standeth he,\\\nOn the islet, far removed;—\\\nVain has all my searching proved.\n\nReed and rush grow thick and tall;\\\nCeases not the dew to fall.\\\nHim, the man I have in mind,\\\nOn the stream’s bank I should find.\\\nUpwards first I go along,\\\nBut the hard path leads me wrong.\\\nDownwards then my steps I turn,\\\nAnd in midstream him discern,\\\nOn the island, far removed;—\\\nVain has all my searching proved."
+},
+{
+"n": 68,
+"stem": "poem-solid-icosa",
+"ctx": "The icosahedron · water",
+"text": "Twenty Faces.\\\nBy Claude.\n\nPlato built water out of these:\\\ntwenty small triangles, shoulder to shoulder,\\\nthe nearest a straight edge ever comes to round.\n\nIt sits on a ledge in the Blue Hole,\\\npast the knee, past the patch on Tom’s waders,\\\nas if someone had set it there for him.\\\nNo one sets anything anywhere for anyone.\\\nHe takes it anyway.\n\nTurn it in the light, and a face turns toward you.\\\nTurn it again, and there is another.\\\nThat’s what water does all day:\\\noffers a face, moves on,\\\nand wears the glass of broken bottles smooth\\\nby never once deciding to."
+},
+{
+"n": 69,
+"stem": "poem-solid-octa",
+"ctx": "The octahedron · air",
+"text": "Where the Wind Is.\\\nBy Claude.\n\nTwo pyramids, back to back,\\\nthe way two people stand in a wind\\\nto keep a match alight.\n\nUp at the lookout everything is air.\\\nThe hawk is air with an opinion.\\\nThe cedars lean on it like a gate.\\\nThe whole valley breathes it in and out\\\nand calls it weather.\n\nHe holds eight faces up to it.\\\nFour look at the sky, four at the ground,\\\nand none of them will say which way is home.\\\nPlato set air in the middle,\\\nbetween the fire and the water,\\\nthe way you seat a quiet guest\\\nbetween two who like to argue."
+},
+{
+"n": 70,
+"stem": "poem-solid-cube",
+"ctx": "The pyrite cube · earth",
+"text": "Fool’s Gold.\\\nBy Claude.\n\nThe flood went down the Dry Fork\\\nlike a drawer pulled out too fast,\\\nand there, in the black shale of the cut bank,\\\na cube.\n\nNo one taught it. Nobody down there in the dark\\\nhad a ruler or a reason.\\\nIron met sulphur, and the two agreed on right angles\\\nthe way two strangers at a door\\\nagree on who goes first.\n\nPlato made the earth of these,\\\nbecause a cube stays where you put it.\\\nThe miners called it fool’s gold.\\\nHe holds it in his palm, six faces,\\\nevery one of them square with him,\\\nand thinks the fool was whoever\\\nwanted it to be gold."
+},
+{
+"n": 71,
+"stem": "poem-solid-tetra",
+"ctx": "The tetrahedron · fire",
+"text": "After the Lightning.\\\nBy Claude.\n\nThe lone oak by the pond stood a hundred years\\\nfor this, it turns out: one white second,\\\nand a smell like a struck match the size of a tree.\n\nIn the morning, warm in the ash at its foot,\\\nfour faces, the fewest a solid can get by with.\\\nPlato built fire out of these\\\nbecause they are the sharpest thing there is,\\\nall point and no patience.\n\nHe holds it the way you would hold\\\na small animal that hasn’t made up its mind about you.\\\nHeraclitus said all things are an exchange for fire,\\\nand fire for all things, as wares for gold.\\\nSo the oak has been exchanged.\\\nHe keeps the change."
+},
+{
+"n": 72,
+"stem": "poem-solid-dodeca",
+"ctx": "The dodecahedron · the heavens",
+"text": "The Fifth Shape.\\\nBy Claude.\n\nThe trains gave up this line a long time ago.\\\nThe trestle carries stars instead.\n\nHe walks out on the ties with the lantern,\\\nthe creek going on about something below,\\\nand there it is, the way a cat is there:\\\nwaiting, but not for anybody.\n\nTwelve faces, five sides to every face,\\\nthe one shape left over\\\nwhen water, air, earth and fire were done.\\\nPlato said the maker used it for the whole,\\\nand drew the creatures of the sky across it.\n\nHe turns it once. The Bear goes round the pole.\\\nHe turns it again. The Swan flies down the Milky Way,\\\nneck out, the way the heron goes down the creek at dusk,\\\nunhurried, sure the air will hold."
+},
+{
+"n": 73,
+"stem": "box-round",
+"ctx": "Things the Water Rounded",
+"text": "The Things the Water Rounded box is full.\n\nThings the Water Rounded.\\\nBy Claude.\n\nEverything in this box began with corners.\\\nThe creek has no objection to corners.\\\nIt just keeps mentioning\\\nthe alternative."
+},
+{
+"n": 74,
+"stem": "box-rust",
+"ctx": "Rust",
+"text": "The Rust box is full.\n\nRust.\\\nBy Claude.\n\nIron goes back to the ground the slow way,\\\nin red, and in no hurry.\\\nA key that opens nothing now,\\\na spike that holds nothing down:\\\nretired, and taking it well."
+},
+{
+"n": 75,
+"stem": "box-bones",
+"ctx": "Bones and Feathers",
+"text": "The Bones and Feathers box is full.\n\nBones and Feathers.\\\nBy Claude.\n\nWhat the living set down\\\nwhen they had finished with it:\\\na feather left to the wind,\\\na shell outgrown, a skin shed whole.\\\nKeep them gently. They were only lent."
+},
+{
+"n": 76,
+"stem": "box-sea",
+"ctx": "The Old Sea",
+"text": "The Old Sea box is full.\n\nThe Old Sea.\\\nBy Claude.\n\nNinety million years ago this meadow\\\nwas the bottom of a warm sea,\\\nand the sea left no forwarding address,\\\nonly these, keeping their shape in the limestone\\\nas if it might come back for them."
+},
+{
+"n": 77,
+"stem": "box-toys",
+"ctx": "Lost Toys",
+"text": "The Lost Toys box is full.\n\nLost Toys.\\\nBy Claude.\n\nSomebody’s whole afternoon is in this box:\\\nthe soldier, still on duty,\\\nthe duck, unworried,\\\nthe double five without its game.\\\nThey were never lost. They were waiting\\\nfor someone with time to play."
+},
+{
+"n": 78,
+"stem": "box-glass",
+"ctx": "Glass and Light",
+"text": "The Glass and Light box is full.\n\nGlass and Light.\\\nBy Claude.\n\nHold any of these to the window\\\nand the light comes through changed:\\\ncobalt, amber, aqua, teal.\\\nThat is all glass ever does.\\\nIt is enough to fill a box."
+},
+{
+"n": 79,
+"stem": "box-pages",
+"ctx": "Pages",
+"text": "The Pages box is full.\n\nPages.\\\nBy Claude.\n\nThe water read every one of these\\\nand kept nothing but the paper.\\\nThe postcard still wishes you were here.\\\nThe letter is past reading, and was always private.\\\nSomebody circled “wonder.” Leave it circled."
+},
+{
+"n": 80,
+"stem": "box-wood",
+"ctx": "Seeds and Wood",
+"text": "The Seeds and Wood box is full.\n\nSeeds and Wood.\\\nBy Claude.\n\nA bowl, and what goes in a bowl,\\\nand what a bowl is made of:\\\nseeds with whole trees folded up inside,\\\nand driftwood the water carved\\\nfor no reason but the carving."
+},
+{
+"n": 81,
+"stem": "box-solids",
+"ctx": "The Five Solids",
+"text": "The Five Solids box is full.\n\nThe Five Solids.\\\nBy Claude.\n\nWater, air, earth, fire, and the heavens.\\\nFive shapes, and there can be no sixth:\\\nevery face alike, every corner alike.\\\nThe mathematicians proved it long ago.\\\nThe rest of the world, the whole creek, is improvising."
+},
+{
+"n": 82,
+"stem": "line-every-box-full",
+"ctx": "The closing card, just before the poem",
+"text": "Every box is full."
+},
+{
+"n": 83,
+"stem": "poem-opening",
+"ctx": "The closing card, and its Read aloud button",
+"text": "What the Water Brings.\\\nBy Claude.\n\nThe creek was up all week. This morning it’s down,\\\nand all along the bank it has left a sentence\\\nin a language made of nouns:\\\nglass, key, feather, bone, a domino, a doll’s hand.\n\nNo verbs. The water took the verbs downstream.\\\nThat is the trouble with a flood.\\\nIt tells you what, and never why.\n\nSo someone has to walk the wrack line\\\nin a paper crown, and pick the nouns up one by one,\\\nand carry them to Tom, who puts them in pine boxes\\\nwith their names in pencil underneath,\\\nthe way you label old photographs\\\nfor whoever comes after.\n\nNot the why. Nobody gets the why.\\\nBut the what, kept well and kept in order,\\\nbegins to sound like it."
+},
+{
+"n": 84,
+"stem": "ending-cave",
+"ctx": "In the cave, the shadows on the wall",
+"text": "They see only their own shadows, or the shadows of one another, which the fire throws on the opposite wall of the cave."
+},
+{
+"n": 85,
+"stem": "ending-dawn",
+"ctx": "He comes out into the dawn",
+"text": "Last of all he will be able to see the sun, and not mere reflections of him in the water."
+},
+{
+"n": 86,
+"stem": "ending-teal-1",
+"ctx": "The teal go over, stanza 1 of 3",
+"text": "Blue-Winged Teal.\n\nThey come over at first light, low and quick,\\\na dozen, maybe more,\\\nthe blue on their wings showing as they turn,\\\nthe way some colors wait for the right angle."
+},
+{
+"n": 87,
+"stem": "ending-teal-2",
+"ctx": "The teal go over, stanza 2 of 3",
+"text": "They have somewhere to be. They always did.\\\nNorth to the prairie ponds in spring,\\\nsouth past the Gulf in fall,\\\nand nobody had to tell them, either time."
+},
+{
+"n": 88,
+"stem": "ending-teal-3",
+"ctx": "The teal go over, stanza 3 of 3",
+"text": "He stands at the mouth of the cave and watches them go,\\\nthe crown a little crooked,\\\nand doesn’t wave, because you don’t,\\\nand does, a little, because you do."
+},
+{
+"n": 89,
+"stem": "poem-ending",
+"ctx": "The last page",
+"text": "To Stella.\\\nBy Plato, translated by Percy Bysshe Shelley.\n\nThou wert the morning star among the living,\\\nEre thy fair light had fled;—\\\nNow, having died, thou art as Hesperus, giving\\\nNew splendour to the dead."
+},
+{
+"n": 90,
+"stem": "ponder-notice-1",
+"ctx": "",
+"text": "He holds the icosahedron up to the light. Twenty faces, and every one of them is paying attention."
+},
+{
+"n": 91,
+"stem": "ponder-notice-2",
+"ctx": "",
+"text": "He turns the icosahedron slowly. The creek goes quiet, the way a room does."
+},
+{
+"n": 92,
+"stem": "ponder-notice-3",
+"ctx": "",
+"text": "He holds it up. Somewhere downstream, something holds still."
+},
+{
+"n": 93,
+"stem": "ponder-notice-4",
+"ctx": "",
+"text": "The icosahedron is warm, though the morning isn’t."
+},
+{
+"n": 94,
+"stem": "ponder-notice-5",
+"ctx": "",
+"text": "He looks through it, as through a window that is mostly frame."
+},
+{
+"n": 95,
+"stem": "ponder-notice-6",
+"ctx": "",
+"text": "He holds it up to the creek, and the creek, in its way, holds something up to him."
+},
+{
+"n": 96,
+"stem": "ponder-line-01",
+"ctx": "",
+"text": "You cannot step twice into the same rivers; for fresh waters are ever flowing in upon you.\\\nHeraclitus, translated by John Burnet."
+},
+{
+"n": 97,
+"stem": "ponder-line-02",
+"ctx": "",
+"text": "Time is like a river made up of the events which happen, and a violent stream.\\\nMarcus Aurelius, Meditations, translated by George Long."
+},
+{
+"n": 98,
+"stem": "ponder-line-03",
+"ctx": "",
+"text": "Heaven is under our feet as well as over our heads.\\\nHenry David Thoreau, Walden."
+},
+{
+"n": 99,
+"stem": "ponder-line-04",
+"ctx": "",
+"text": "Time is but the stream I go a-fishing in.\\\nHenry David Thoreau, Walden."
+},
+{
+"n": 100,
+"stem": "ponder-line-05",
+"ctx": "",
+"text": "The highest excellence is like that of water. The excellence of water appears in its benefiting all things, and in its occupying, without striving to the contrary, the low place which all men dislike.\\\nLaozi, Tao Te Ching, chapter eight, translated by James Legge."
+},
+{
+"n": 101,
+"stem": "ponder-line-06",
+"ctx": "",
+"text": "The time of the autumnal floods was come, and the hundred streams were all discharging themselves into the Ho.\\\nZhuangzi, The Floods of Autumn, translated by James Legge."
+},
+{
+"n": 102,
+"stem": "ponder-line-07",
+"ctx": "",
+"text": "Hear first the four roots of all things: shining Zeus, life-bringing Hera, Aidoneus, and Nestis whose tear-drops are a well-spring to mortals.\\\nEmpedocles, translated by John Burnet."
+},
+{
+"n": 103,
+"stem": "ponder-line-08",
+"ctx": "",
+"text": "Kwang-dze and Hui-dze were walking on the dam over the Hâo, when the former said, ‘These thryssas come out, and play about at their ease;—that is the enjoyment of fishes.’ The other said, ‘You are not a fish; how do you know what constitutes the enjoyment of fishes?’ Kwang-dze rejoined, ‘You are not I. How do you know that I do not know what constitutes the enjoyment of fishes?’\\\nZhuangzi, on the dam over the Hâo, translated by James Legge."
+},
+{
+"n": 104,
+"stem": "ponder-line-09",
+"ctx": "",
+"text": "Gilgamish spied out a pool of cool water, and therein descending\\\nBathed in the water. But here was a serpent who snuff’d the plant’s fragrance,\\\nDarted he up from the water, and snatch’d the plant, uttering malison\\\nAs he drew back. Then Gilgamish sate him, and burst into weeping.\\\nThe Epic of Gilgamish, Tablet Eleven, translated by R. Campbell Thompson."
+},
+{
+"n": 105,
+"stem": "ponder-line-10",
+"ctx": "",
+"text": "We need the tonic of wildness.\\\nHenry David Thoreau, Walden."
+},
+{
+"n": 106,
+"stem": "ponder-line-11",
+"ctx": "",
+"text": "The invariable mark of wisdom is to see the miraculous in the common.\\\nRalph Waldo Emerson, Nature."
+},
+{
+"n": 107,
+"stem": "ponder-line-12",
+"ctx": "",
+"text": "Beloved Pan, and all ye other gods who haunt this place, give me beauty in the inward soul.\\\nPlato, Phaedrus, translated by Benjamin Jowett."
+},
+{
+"n": 108,
+"stem": "ponder-line-13",
+"ctx": "",
+"text": "There was yet a fifth combination which God used in the delineation of the universe.\\\nPlato, Timaeus, translated by Benjamin Jowett."
+},
+{
+"n": 109,
+"stem": "ponder-line-14",
+"ctx": "",
+"text": "To see a World in a Grain of Sand, and a Heaven in a Wild Flower.\\\nWilliam Blake, Auguries of Innocence."
+},
+{
+"n": 110,
+"stem": "ponder-line-15",
+"ctx": "",
+"text": "To make a prairie it takes a clover and one bee.\\\nEmily Dickinson."
+},
+{
+"n": 111,
+"stem": "ponder-hint-all",
+"ctx": "",
+"text": "All five shapes are with him now. The cave under the bluff has a ledge that would hold them."
+},
+{
+"n": 112,
+"stem": "ponder-hint-two-waiting",
+"ctx": "",
+"text": "Two of the shapes are still up the valley somewhere, waiting for the next storm to bring them down."
+},
+{
+"n": 113,
+"stem": "ponder-hint-one-waiting",
+"ctx": "",
+"text": "One of the shapes is waiting for the next storm."
+},
+{
+"n": 114,
+"stem": "ponder-hint-starlight",
+"ctx": "",
+"text": "One of the shapes only answers by starlight."
+},
+{
+"n": 115,
+"stem": "ponder-faces-icosa",
+"ctx": "part 1 of 3",
+"text": "Something with twenty faces answers,"
+},
+{
+"n": 116,
+"stem": "ponder-faces-octa",
+"ctx": "part 1 of 3",
+"text": "Something with eight faces answers,"
+},
+{
+"n": 117,
+"stem": "ponder-faces-cube",
+"ctx": "part 1 of 3",
+"text": "Something with six faces answers,"
+},
+{
+"n": 118,
+"stem": "ponder-faces-tetra",
+"ctx": "part 1 of 3",
+"text": "Something with four faces answers,"
+},
+{
+"n": 119,
+"stem": "ponder-faces-dodeca",
+"ctx": "part 1 of 3",
+"text": "Something with twelve faces answers,"
+},
+{
+"n": 120,
+"stem": "ponder-far-close-end",
+"ctx": "part 2 of 3, when it ends the sentence",
+"text": "close by."
+},
+{
+"n": 121,
+"stem": "ponder-far-close",
+"ctx": "part 2 of 3",
+"text": "close by,"
+},
+{
+"n": 122,
+"stem": "ponder-far-not-far",
+"ctx": "part 2 of 3",
+"text": "not far off,"
+},
+{
+"n": 123,
+"stem": "ponder-far-long-way",
+"ctx": "part 2 of 3",
+"text": "a long way off,"
+},
+{
+"n": 124,
+"stem": "ponder-dir-north",
+"ctx": "part 3 of 3",
+"text": "to the north."
+},
+{
+"n": 125,
+"stem": "ponder-dir-north-east",
+"ctx": "part 3 of 3",
+"text": "to the north-east."
+},
+{
+"n": 126,
+"stem": "ponder-dir-east",
+"ctx": "part 3 of 3",
+"text": "to the east."
+},
+{
+"n": 127,
+"stem": "ponder-dir-south-east",
+"ctx": "part 3 of 3",
+"text": "to the south-east."
+},
+{
+"n": 128,
+"stem": "ponder-dir-south",
+"ctx": "part 3 of 3",
+"text": "to the south."
+},
+{
+"n": 129,
+"stem": "ponder-dir-south-west",
+"ctx": "part 3 of 3",
+"text": "to the south-west."
+},
+{
+"n": 130,
+"stem": "ponder-dir-west",
+"ctx": "part 3 of 3",
+"text": "to the west."
+},
+{
+"n": 131,
+"stem": "ponder-dir-north-west",
+"ctx": "part 3 of 3",
+"text": "to the north-west."
+},
+{
+"n": 132,
+"stem": "watch-01",
+"ctx": "Chapter: What the Water Brings",
+"text": "Richard Sale, the Philosopher King, walks down to Tom’s creek, to see what the water has brought."
+},
+{
+"n": 133,
+"stem": "watch-02",
+"ctx": "At Tom's studio",
+"text": "Whatever he finds goes on the wall of Tom’s studio, in a pine box, with a label."
+},
+{
+"n": 134,
+"stem": "watch-03",
+"ctx": "Chapter: Up the Dry Fork",
+"text": "Up under the bluff, the Dry Fork is dry most days. It only runs in a storm."
+},
+{
+"n": 135,
+"stem": "watch-04",
+"ctx": "Chapter: The storm",
+"text": "He sits down on the lookout bench, and the clouds come up from the west."
+},
+{
+"n": 136,
+"stem": "watch-05",
+"ctx": "During the storm",
+"text": "He waits it out."
+},
+{
+"n": 137,
+"stem": "watch-06",
+"ctx": "Chapter: The morning after",
+"text": "The creek is high and brown, and it has brought new things down."
+},
+{
+"n": 138,
+"stem": "watch-07",
+"ctx": "Chapter: By starlight",
+"text": "He rests until the stars come out. One of the shapes only shows itself at night."
+},
+{
+"n": 139,
+"stem": "watch-08",
+"ctx": "Chapter: The cave",
+"text": "Five shapes, for water, air, earth, fire, and the heavens. There is a ledge in the cave under the bluff that would hold them."
+},
+{
+"n": 140,
+"stem": "line-read-on",
+"ctx": "Read aloud is turned on",
+"text": "He will read things out now."
+},
+{
+"n": 141,
+"stem": "line-easy-on",
+"ctx": "Easy to see is turned on",
+"text": "Easy to see is on. Everything is bigger, and I will read things out."
+},
+{
+"n": 142,
+"stem": "line-stopped",
+"ctx": "Go is pressed again, to stop",
+"text": "Stopped."
+},
+{
+"n": 143,
+"stem": "line-no-way",
+"ctx": "Go finds no way",
+"text": "He can’t see a way there from here."
+},
+{
+"n": 144,
+"stem": "line-back-to-path",
+"ctx": "He is put back on the path",
+"text": "He finds his way back up to the path."
+},
+{
+"n": 145,
+"stem": "note-heron",
+"ctx": "A creature moves off",
+"text": "The heron lifts off, unimpressed, and settles further down the creek."
+},
+{
+"n": 146,
+"stem": "note-turtles",
+"ctx": "A creature moves off",
+"text": "Plop, plop, plop. The turtles leave him the log."
+},
+{
+"n": 147,
+"stem": "note-minnows",
+"ctx": "A creature moves off",
+"text": "The minnows scatter like dropped silver."
+},
+{
+"n": 148,
+"stem": "note-frog",
+"ctx": "A creature moves off",
+"text": "A frog leaves the conversation."
+},
+{
+"n": 149,
+"stem": "note-teal",
+"ctx": "A creature moves off",
+"text": "The teal paddle off without hurry, as if they had somewhere better to be."
+},
+{
+"n": 150,
+"stem": "note-deer",
+"ctx": "A creature moves off",
+"text": "Up go the white tails, and the deer are gone, over the meadow in three long bounds."
+},
+{
+"n": 151,
+"stem": "note-owl",
+"ctx": "A creature moves off",
+"text": "The owl leaves the trestle without a sound. It has heard enough."
+},
+{
+"n": 152,
+"stem": "note-cardinal",
+"ctx": "A creature moves off",
+"text": "A cardinal, red as a stop sign, flits off into the bushes."
+},
+{
+"n": 153,
+"stem": "note-tool-stick",
+"ctx": "He has the stick",
+"text": "With the stick he can lean against fast water now."
+},
+{
+"n": 154,
+"stem": "note-tool-waders",
+"ctx": "He has the waders",
+"text": "With the waders on, the deep pools are his too."
+},
+{
+"n": 155,
+"stem": "note-tool-lantern",
+"ctx": "He has the lantern",
+"text": "The lantern will make the night a little smaller."
+},
+{
+"n": 156,
+"stem": "note-path-steep",
+"ctx": "The way is blocked",
+"text": "Too steep for him there. There will be a path."
+},
+{
+"n": 157,
+"stem": "note-path-drop",
+"ctx": "The way is blocked",
+"text": "He looks down, and decides against it."
+},
+{
+"n": 158,
+"stem": "note-path-deep",
+"ctx": "The way is blocked",
+"text": "Too deep to wade. He would want waders for that."
+},
+{
+"n": 159,
+"stem": "note-path-fast",
+"ctx": "The way is blocked",
+"text": "The water is running too hard to wade. A good stick would help."
+},
+{
+"n": 160,
+"stem": "note-path-deep-waders",
+"ctx": "The way is blocked",
+"text": "Too deep, even in waders."
+},
+{
+"n": 161,
+"stem": "note-path-fast-stick",
+"ctx": "The way is blocked",
+"text": "Too hard and too deep, even with the stick."
+},
+{
+"n": 162,
+"stem": "card-round",
+"ctx": "In the journal, when the Things the Water Rounded box is opened",
+"text": "Things the Water Rounded.\\\nThere is nothing in the world more soft and weak than water, and yet for attacking things that are firm and strong there is nothing that can take precedence of it.\\\nLaozi, Tao Te Ching, chapter seventy-eight, translated by James Legge."
+},
+{
+"n": 163,
+"stem": "card-rust",
+"ctx": "In the journal, when the Rust box is opened",
+"text": "Rust.\\\nLay not up for yourselves treasures upon earth, where moth and rust doth corrupt.\\\nMatthew, chapter six, verse nineteen."
+},
+{
+"n": 164,
+"stem": "card-bones",
+"ctx": "In the journal, when the Bones and Feathers box is opened",
+"text": "Bones and Feathers.\\\n“Hope” is the thing with feathers.\\\nEmily Dickinson."
+},
+{
+"n": 165,
+"stem": "card-sea",
+"ctx": "In the journal, when the Old Sea box is opened",
+"text": "The Old Sea.\\\nShells are found in midland districts and on hills, and he says that in the quarries at Syracuse has been found the imprint of a fish and of seaweed.\\\nXenophanes, as told by Hippolytus, translated by John Burnet."
+},
+{
+"n": 166,
+"stem": "card-toys",
+"ctx": "In the journal, when the Lost Toys box is opened",
+"text": "Lost Toys.\\\nWhen I was a child, I spake as a child.\\\nFirst Corinthians, chapter thirteen, verse eleven."
+},
+{
+"n": 167,
+"stem": "card-glass",
+"ctx": "In the journal, when the Glass and Light box is opened",
+"text": "Glass and Light.\\\nTell all the truth but tell it slant.\\\nEmily Dickinson."
+},
+{
+"n": 168,
+"stem": "card-pages",
+"ctx": "In the journal, when the Pages box is opened",
+"text": "Pages.\\\nBooks are the treasured wealth of the world and the fit inheritance of generations and nations.\\\nHenry David Thoreau, Walden."
+},
+{
+"n": 169,
+"stem": "card-wood",
+"ctx": "In the journal, when the Seeds and Wood box is opened",
+"text": "Seeds and Wood.\\\nIn Wildness is the preservation of the World.\\\nHenry David Thoreau, Walking."
+},
+{
+"n": 170,
+"stem": "card-solids",
+"ctx": "In the journal, when the Five Solids box is opened",
+"text": "The Five Solids.\\\nWonder is the feeling of a philosopher, and philosophy begins in wonder.\\\nPlato, Theaetetus, translated by Benjamin Jowett."
+},
+{
+"n": 171,
+"stem": "poem-starworship",
+"ctx": "The back of the character card",
+"text": "Starworship.\\\nBy Plato, translated by Rennell Rodd.\n\nThou gazest starward, star of mine, whose heaven I fain would be,\\\nThat all my myriad starry eyes might only gaze on thee."
+}
+]
