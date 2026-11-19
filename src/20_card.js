@@ -63,21 +63,3 @@
 })();
 
 ;
-/* PKValley: the creek valley of "What the Water Brings", drawn for the pixel renderer (PKPixel3D).
-   A North Texas creek valley about 220 x 150 m:
-     King's Creek      the main creek, always flowing west to east; low, normal, high and flood levels
-     Dry Fork          a white limestone bed coming down from the bluff over the Dry Falls; dry most days, a torrent in a storm
-     Teal Branch       spring-fed, clear and cold, out of a grotto under the south hill; runs even in a drought
-     the stock pond    still water behind an earth dam, with a windmill and a stock tank
-     the bluff         a limestone escarpment along the north side, with a shallow cave and a lookout reached by a switchback
-     the county road   a gravel road with a low-water crossing (it floods); the old railroad on an embankment with a trestle
-     Tom's studio      a board shed with his truck at the trailhead, at the west end
-   The ground is one height function; the area round him is built in 32 m tiles at the chosen detail (streamed as he walks),
-   and the whole valley is always there as a light far version, so a low view still sees the land to the horizon.
-
-     const W = PKValley.create({ detail: 4 });   scene.add(W.group);
-     W.ensure(x, z)        build the tiles round a spot now (start, teleport)
-     W.stream(x, z, ms)    build / drop tiles as he walks (call each frame with a time budget)
-     W.height(x, z, feet)  ground (or deck / stone / log) under a point;  W.water(x, z) water surface or null;  W.wading(x, z, feet)
-     W.fast(x, z)          true where the water is running too hard to wade (a flood, or the Dry Fork in a storm)
-     W.collide(p, r)       pushes a {x, z} point out of trunks, rocks, posts, rails and walls

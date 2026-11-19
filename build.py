@@ -36,3 +36,6 @@ if os.path.isdir(vdir):   # the recordings go beside the page too
 if os.path.isdir(os.path.join(here, 'music')):   # the songs go beside the page
     shutil.copytree(os.path.join(here, 'music'), os.path.join(here, 'out', 'music'), dirs_exist_ok=True)
 print('built out/index.html', len(page.encode('utf8')), 'bytes', hashlib.md5(page.encode('utf8')).hexdigest()[:8])
+# and the sound board, beside the game
+import subprocess
+subprocess.run([sys.executable, os.path.join(here, 'tools', 'build_board.py')], check=True)

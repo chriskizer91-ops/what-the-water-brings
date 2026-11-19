@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The valley's sounds · What the Water Brings</title>
+<meta name="theme-color" content="#1b1a18">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root { --bg: #1b1a18; --ink: #f2efe9; --muted: #b5aea2; --line: rgba(242,239,233,.14); --card: #24221f; --chip: #2e2b27; --accent: #ea7a2a; --gold: #c9a24e;
+    --f-display: 'Gloock', Georgia, serif; --f-body: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif; --f-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); -webkit-text-size-adjust: 100%; }
+  body { padding: env(safe-area-inset-top, 0) 0 calc(96px + env(safe-area-inset-bottom, 0)); }
+  main { max-width: 620px; margin: 0 auto; padding: 22px 16px 0; }
+  h1 { font-family: var(--f-display); font-weight: 400; font-size: 30px; line-height: 1.1; margin: 4px 0 6px; }
+  .lede { color: var(--muted); font-size: 15px; line-height: 1.45; margin: 0 0 18px; }
+  h2 { font-family: var(--f-mono); font-weight: 500; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 26px 2px 8px; }
+  button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .scenes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .scene { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 14px 12px; text-align: left; min-height: 64px; }
+  .scene b { display: block; font-size: 17px; font-weight: 600; }
+  .scene span { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .scene[aria-pressed="true"] { border-color: var(--gold); background: #2f2a20; }
+  .over { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .pill { background: var(--chip); border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px; font-size: 14px; }
+  .pill[aria-pressed="true"] { border-color: var(--gold); color: #fff; background: #3a3224; }
+  .now { min-height: 22px; margin: 12px 2px 0; color: var(--muted); font-size: 14px; }
+  .now b { color: var(--ink); font-weight: 600; }
+  .group { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .row { border-top: 1px solid var(--line); }
+  .row:first-child { border-top: 0; }
+  .head { display: flex; align-items: center; gap: 12px; padding: 10px 12px; }
+  .play { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--chip); display: grid; place-items: center; }
+  .play svg { width: 16px; height: 16px; fill: var(--ink); }
+  .play.on { background: var(--gold); border-color: var(--gold); }
+  .play.on svg { fill: #1b1a18; }
+  .name { flex: 1; text-align: left; background: none; border: 0; padding: 4px 0; min-width: 0; }
+  .name b { display: block; font-size: 16px; font-weight: 600; }
+  .name span { display: block; color: var(--muted); font-size: 13px; line-height: 1.35; margin-top: 1px; }
+  .tag { flex: none; font-family: var(--f-mono); font-size: 12px; color: var(--gold); }
+  .tag.off { color: var(--muted); }
+  .adj { display: none; padding: 2px 12px 14px 68px; }
+  .row.open .adj { display: block; }
+  .adj label { display: block; font-size: 13px; color: var(--muted); margin: 4px 0 6px; }
+  .adj input[type=range] { width: 100%; accent-color: var(--gold); height: 28px; }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .seg button { background: none; border: 0; padding: 8px 14px; font-size: 14px; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: #1b1a18; }
+  .note { color: var(--muted); font-size: 13px; line-height: 1.45; margin: 10px 2px 0; }
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(27,26,24,.96); border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0)); }
+  .bar .in { max-width: 620px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
+  .bar .txt { flex: 1; font-family: var(--f-mono); font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; user-select: all; -webkit-user-select: all; }
+  .bar .copy { background: var(--gold); color: #1b1a18; border: 0; border-radius: 999px; padding: 11px 16px; font-weight: 700; font-size: 14px; white-space: nowrap; }
+  .stop { background: none; border: 1px solid var(--line); border-radius: 999px; padding: 11px 14px; font-size: 14px; }
+  .start { position: fixed; inset: 0; background: rgba(27,26,24,.97); display: grid; place-items: center; z-index: 9; padding: 24px; text-align: center; }
+  .start[hidden] { display: none; }
+  .start h1 { font-size: 34px; }
+  .start p { color: var(--muted); max-width: 340px; margin: 8px auto 22px; line-height: 1.45; }
+  .start button { background: var(--gold); color: #1b1a18; border: 0; border-radius: 999px; padding: 15px 28px; font-weight: 700; font-size: 17px; }
+</style></head>
+<body>
+<div class="start" id="start"><div><h1>The valley's sounds</h1><p>Every animal and every bit of weather in What the Water Brings. Use headphones or a good speaker.</p><button type="button" id="go">Start listening</button></div></div>
+<main>
+  <h1>The valley's sounds</h1>
+  <p class="lede">Play a whole hour of the day to hear the mix, or tap ▶ on one sound. Tap a sound's name to turn it up, down or off. When you're happy, copy your settings at the bottom and send them to Claude.</p>
+
+  <h2>Play the valley</h2>
+  <div class="scenes" id="scenes"></div>
+  <div class="over">
+    <button type="button" class="pill" id="narr" aria-pressed="false">+ David reading</button>
+    <button type="button" class="pill" id="mus" aria-pressed="false">+ Music: off</button>
+  </div>
+  <div class="now" id="now"></div>
+
+  <div id="groups"></div>
+  <p class="note">Silent, like the real things: the turkey vultures, the bats, the luna moth, the butterflies and the minnows.</p>
+  <p class="note">Every sound here is made the same way as in the game, and at the same loudness as in the game. David's voice and the music play at the game's levels too.</p>
+</main>
+<div class="bar"><div class="in"><button type="button" class="stop" id="stop">Stop</button><div class="txt" id="txt"></div><button type="button" class="copy" id="copy">Copy settings</button></div></div>
+
+<script>
+/*NATURE*/
+</script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var ctx = null, N = null, KEY = 'wwb-soundboard-v1', user = {};
+  try { user = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { user = {}; }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(user)); } catch (e) {} txt(); }
+  var SCENES = /*SCENES*/;
+  var SCENE_LIST = [
+    ['dawn', 'Dawn', 'by the creek, 6:30'], ['day', 'Midday', 'on the trail, 1:30'], ['evening', 'Evening', 'by the stock pond, 7:30'],
+    ['night', 'Night', 'on the trail, 11:00'], ['storm', 'The storm', 'rain, wind, the falls'], ['cave', 'The cave fire', 'the ending, before dawn']
+  ];
+  // what each scene's music would be in the game (the storm has none), and David's lines to read over it
+  var SONG = { dawn: 'music/pastoral-pixel.mp3', day: 'music/unhurried-exploration.mp3', evening: 'music/golden-hour.mp3', night: 'music/pastoral-quiet.mp3', cave: 'music/golden-hour.mp3' };
+  var LINES = ['voice/find-stick.mp3', 'voice/ponder-notice-1.mp3', 'voice/find-feather.mp3', 'voice/poem-bench.mp3', 'voice/find-glassg.mp3', 'voice/find-key.mp3'];
+  var scene = null, timer = null, last = 0, bedOn = {}, narr = false, mus = 0, voice = null, vi = 0, vWait = 3, song = null, songGain = null, duck = 1;
+
+  function start() {
+    if (ctx) return;
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    N = PKNature.make(ctx, ctx.destination); N.user = user;
+    timer = setInterval(tick, 100); last = ctx.currentTime;
+    $('start').hidden = true;
+  }
+  $('go').addEventListener('click', start);
+  document.addEventListener('click', function () { if (ctx && ctx.state === 'suspended') ctx.resume(); }, true);
+
+  // ---------------------------------------------------------------- the scenes
+  var sc = $('scenes');
+  SCENE_LIST.forEach(function (s) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'scene'; b.dataset.id = s[0]; b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = '<b></b><span></span>'; b.querySelector('b').textContent = s[1]; b.querySelector('span').textContent = s[2];
+    b.addEventListener('click', function () { start(); playScene(scene === s[0] ? null : s[0]); });
+    sc.appendChild(b);
+  });
+  function playScene(id) {
+    stopBeds(); scene = id; N.amb.t = {}; heard = [];
+    [].forEach.call(sc.children, function (b) { b.setAttribute('aria-pressed', b.dataset.id === id ? 'true' : 'false'); });
+    if (!id) { N.stopAll(); songStop(); $('now').textContent = ''; } else { $('now').innerHTML = 'Playing <b>' + SCENE_LIST.filter(function (s) { return s[0] === id; })[0][1] + '</b>'; songFor(); }
+  }
+
+  // ---------------------------------------------------------------- the list of sounds
+  var META = PKNature.META, NAME = {}; META.forEach(function (m) { NAME[m.id] = m.name; });
+  var groups = []; META.forEach(function (m) { if (groups.indexOf(m.group) < 0) groups.push(m.group); });
+  var BEDPARAMS = { creek: [1, { flow: 0.3 }], wind: [0.6, { strength: 0.3 }], rain: [1, { intensity: 1 }], falls: [1, {}], fire: [1, {}], crickets: [1, { density: 1 }], katydids: [1, { density: 0.6 }] };
+  var EXTRA = { creek: ['In the flood', function () { bedPlay('creek', [1, { flow: 1 }]); }], wind: ['In the storm', function () { bedPlay('wind', [1, { strength: 1 }]); }], thunder: ['Far off', function () { N.call('thunder', { km: 3 }); shown('thunder'); }] };
+  var PLAY = '<svg viewBox="0 0 16 16"><path d="M4 2.5v11l9.5-5.5z"/></svg>', STOP = '<svg viewBox="0 0 16 16"><rect x="3.5" y="3.5" width="9" height="9" rx="1"/></svg>';
+  var rows = {};
+  groups.forEach(function (g) {
+    var h = document.createElement('h2'); h.textContent = g; $('groups').appendChild(h);
+    var box = document.createElement('div'); box.className = 'group'; $('groups').appendChild(box);
+    META.filter(function (m) { return m.group === g; }).forEach(function (m) {
+      var r = document.createElement('div'); r.className = 'row'; rows[m.id] = r;
+      r.innerHTML = '<div class="head"><button type="button" class="play" aria-label="Play">' + PLAY + '</button><button type="button" class="name"><b></b><span></span></button><span class="tag"></span></div>' +
+        '<div class="adj"><label>Loudness: <span class="pct"></span></label><input type="range" min="0" max="200" step="10">' +
+        '<div class="btns"><span class="seg"><button type="button" data-v="on">In the game</button><button type="button" data-v="off">Left out</button></span></div></div>';
+      r.querySelector('.name b').textContent = m.name; r.querySelector('.name span').textContent = m.where;
+      var btns = r.querySelector('.btns');
+      if (m.old) { var o = document.createElement('button'); o.type = 'button'; o.className = 'pill'; o.textContent = 'Hear the old one'; o.addEventListener('click', function () { start(); N.legacy(m.id); }); btns.appendChild(o); }
+      if (EXTRA[m.id]) { var x = document.createElement('button'); x.type = 'button'; x.className = 'pill'; x.textContent = EXTRA[m.id][0]; x.addEventListener('click', function () { start(); EXTRA[m.id][1](); }); btns.appendChild(x); }
+      r.querySelector('.play').addEventListener('click', function () {
+        start();
+        if (m.kind === 'bed') { if (bedOn[m.id]) bedStop(m.id); else bedPlay(m.id, BEDPARAMS[m.id]); }
+        else { var u = user[m.id]; var len = N.call(m.id, { pan: (Math.random() - 0.5) * 0.6, raw: false, km: m.id === 'thunder' ? 0.8 : undefined }); if (!len && u && u.on === false) { flash(r); } shown(m.id); }
+      });
+      r.querySelector('.name').addEventListener('click', function () { r.classList.toggle('open'); });
+      var rg = r.querySelector('input');
+      rg.addEventListener('input', function () { var u = user[m.id] = user[m.id] || {}; u.gain = rg.value / 100; if (u.on == null) u.on = !m.off; paint(m.id); save(); });
+      [].forEach.call(r.querySelectorAll('.seg button'), function (b) { b.addEventListener('click', function () { var u = user[m.id] = user[m.id] || {}; u.on = b.dataset.v === 'on'; paint(m.id); save(); }); });
+      box.appendChild(r); paint(m.id);
+    });
+  });
+  function flash(r) { r.classList.add('open'); }
+  function paint(id) {
+    var m = META.filter(function (q) { return q.id === id; })[0], r = rows[id], u = user[id] || {}, on = u.on == null ? !m.off : u.on, g = Math.round((u.gain == null ? 1 : u.gain) * 100);
+    r.querySelector('input').value = g; r.querySelector('.pct').textContent = g + '%';
+    [].forEach.call(r.querySelectorAll('.seg button'), function (b) { b.setAttribute('aria-pressed', (b.dataset.v === 'on') === on ? 'true' : 'false'); });
+    var t = r.querySelector('.tag'); t.className = 'tag' + (on ? '' : ' off'); t.textContent = on ? (g !== 100 ? g + '%' : '') : 'left out';
+  }
+  function bedPlay(id, p) { bedOn[id] = p; var pl = rows[id].querySelector('.play'); pl.classList.add('on'); pl.innerHTML = STOP; shown(id); }
+  function bedStop(id) { delete bedOn[id]; if (N && N.beds[id]) N.beds[id].set(0); var pl = rows[id].querySelector('.play'); pl.classList.remove('on'); pl.innerHTML = PLAY; }
+  function stopBeds() { Object.keys(bedOn).forEach(bedStop); }
+
+  // what is calling just now, so a sound that seems wrong can be found and turned down
+  var heard = [];
+  function shown(id) { heard = heard.filter(function (h) { return h !== id; }); heard.unshift(id); heard = heard.slice(0, 3); var lead = scene ? 'Playing <b>' + SCENE_LIST.filter(function (s) { return s[0] === scene; })[0][1] + '</b>. ' : ''; $('now').innerHTML = lead + 'Just now: ' + heard.map(function (h) { return NAME[h]; }).join(' · '); }
+  var seenLive = {};
+
+  // ---------------------------------------------------------------- every tenth of a second
+  function tick() {
+    if (!N) return;
+    var now = ctx.currentTime, dt = Math.min(0.5, now - last); last = now;
+    if (scene) {
+      var s = Object.assign({}, SCENES[scene]); s.quiet = voice && !voice.paused ? 0.25 : 0;
+      N.amb.update(dt, s);
+      N.live.forEach(function (c) { var k = c.id + ':' + c.end.toFixed(2); if (!seenLive[k]) { seenLive[k] = 1; shown(c.id); } });
+    } else {
+      for (var id in N.beds) { if (!bedOn[id]) N.beds[id].set(0); }
+      for (var b in bedOn) N.bed(b).set(bedOn[b][0], bedOn[b][1]);
+      N.tick();
+    }
+    // David over it: a line, then a pause, then the next
+    if (narr && !(voice && !voice.paused)) { vWait -= dt; if (vWait <= 0) { voice = new Audio(LINES[vi++ % LINES.length]); voice.play().catch(function () {}); vWait = 10; } }
+    // the music drops under the voice, as in the game
+    duck += ((voice && !voice.paused ? 0.18 : 1) - duck) * Math.min(1, dt * 2.5);
+    if (songGain) songGain.gain.value = [0, 0.25, 0.425][mus] * duck;
+  }
+
+  // ---------------------------------------------------------------- David and the music
+  $('narr').addEventListener('click', function () { start(); narr = !narr; this.setAttribute('aria-pressed', narr ? 'true' : 'false'); if (!narr && voice) { voice.pause(); voice = null; } vWait = 0.5; });
+  $('mus').addEventListener('click', function () { start(); mus = (mus + 1) % 3; this.textContent = '+ Music: ' + ['off', 'on', 'louder'][mus]; this.setAttribute('aria-pressed', mus ? 'true' : 'false'); songFor(); });
+  function songStop() { if (song) { song.pause(); song = null; songGain = null; } }
+  function songFor() {
+    var want = mus && scene && SONG[scene] ? SONG[scene] : null;
+    if (song && song.dataset.src === want) return; songStop(); if (!want) return;
+    song = new Audio(want); song.dataset.src = want; song.loop = true;
+    try { var src = ctx.createMediaElementSource(song); songGain = ctx.createGain(); songGain.gain.value = 0; src.connect(songGain); songGain.connect(ctx.destination); } catch (e) { songGain = null; song.volume = 0.25; }
+    song.play().catch(function () {});
+  }
+  $('stop').addEventListener('click', function () { if (!N) return; playScene(null); stopBeds(); N.stopAll(); if (voice) { voice.pause(); voice = null; } narr = false; $('narr').setAttribute('aria-pressed', 'false'); });
+
+  // ---------------------------------------------------------------- the settings, to send back
+  function txt() { $('txt').textContent = textOf(); }
+  function textOf() { var parts = []; META.forEach(function (m) { var u = user[m.id]; if (!u) return; var on = u.on == null ? !m.off : u.on, g = Math.round((u.gain == null ? 1 : u.gain) * 100); if (on !== !m.off) parts.push(m.id + ' ' + (on ? 'on' : 'off')); if (on && g !== 100) parts.push(m.id + ' ' + g); }); return 'WWB sounds: ' + (parts.length ? parts.join(', ') : 'all as they are'); }
+  txt();
+  $('copy').addEventListener('click', function () {
+    var t = textOf(), b = this;
+    function done(ok) { b.textContent = ok ? 'Copied' : 'Long-press the text'; setTimeout(function () { b.textContent = 'Copy settings'; }, 2200); }
+    try { navigator.clipboard.writeText(t).then(function () { done(true); }, function () { done(false); }); } catch (e) { done(false); }
+  });
+  window.SB = { get N() { return N; }, playScene: playScene, user: user, rows: rows, bedOn: bedOn, textOf: textOf, start: start };
+})();
+</script>
+</body></html>

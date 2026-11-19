@@ -1,0 +1,43 @@
+{
+ "dawn": {
+  "hour": 6.4,
+  "water": 10,
+  "pond": 90,
+  "spring": 80
+ },
+ "day": {
+  "hour": 13.5,
+  "water": 28,
+  "pond": 80,
+  "spring": 80
+ },
+ "evening": {
+  "hour": 19.6,
+  "water": 22,
+  "pond": 14,
+  "spring": 90
+ },
+ "night": {
+  "hour": 23,
+  "water": 16,
+  "pond": 70,
+  "spring": 90
+ },
+ "storm": {
+  "hour": 15,
+  "storm": 1,
+  "flood": 0.9,
+  "water": 20,
+  "falls": 45,
+  "pond": 80,
+  "spring": 90
+ },
+ "cave": {
+  "hour": 4.8,
+  "fire": 1,
+  "cave": true,
+  "water": 40,
+  "pond": 90,
+  "spring": 90
+ }
+}
