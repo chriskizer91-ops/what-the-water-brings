@@ -284,7 +284,7 @@
   }
   function musicUpdate(dt) {
     if (!AU.ctx) return;
-    var lvl = save.music === 'off' || !save.sound ? 0 : (save.music === 'quiet' || EASY.on ? 0.26 : 0.5);
+    var lvl = save.music === 'off' || !save.sound ? 0 : save.music === 'loud' ? (EASY.on ? 0.5 : 0.85) : (save.music === 'quiet' || EASY.on ? 0.26 : 0.5);   // Louder is one step up (about 4.6 dB); Easy to see keeps everything a step lower
     MUS.level = lvl; MUS.duck += ((speechBusy() ? 0.18 : 1) - MUS.duck) * Math.min(1, dt * 2.5);
     var sc = musicScene();
     if (sc !== MUS.scene) {
