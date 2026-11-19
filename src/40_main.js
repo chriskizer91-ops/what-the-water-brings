@@ -227,6 +227,8 @@
       var g = C.createGain(); g.gain.value = 0.0;
       src.connect(bp); bp.connect(g); g.connect(AU.master); src.start();
       AU.creek = g;
+      // the valley's own sounds (Nov 19): every creature, the water, the wind and the weather (src/25_nature.js)
+      if (window.PKNature) { AU.nat = PKNature.make(C, AU.master); natMix(); }
     } catch (e) { AU.ctx = null; }
   }
   function tone(freq, t0, dur, vol, type, pan) {
@@ -308,6 +310,11 @@
   }
   // sound can only start after a touch, a click or a key: the first one, anywhere (the title too), starts it
   ['pointerdown', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function first() { audioStart(); if (AU.ctx && AU.ctx.state === 'suspended') AU.ctx.resume(); }, { once: true, capture: true }); });
+  // Nature and Wind (Nov 19): Soft is half as loud as Normal (-6 dB), Loud nearly twice (+5 dB). Easy to see keeps them a little lower, under the voice.
+  var NATLV = { soft: 0.5, normal: 1, loud: 1.8 };
+  function natMix() { if (!AU.nat) return; var e = EASY && EASY.on ? 0.7 : 1; AU.nat.mix.nature = (NATLV[save.nature] || 1) * e; AU.nat.mix.wind = (NATLV[save.wind] || 1) * e; }
+  function setNat(k, v) { save[k] = v; persist(); natMix(); [].forEach.call($(k === 'wind' ? 'segWind' : 'segNature').children, function (b) { b.setAttribute('aria-pressed', b.dataset.v === v ? 'true' : 'false'); }); }
+  ['nature', 'wind'].forEach(function (k) { [].forEach.call($(k === 'wind' ? 'segWind' : 'segNature').children, function (b) { b.addEventListener('click', function () { audioStart(); setNat(k, b.dataset.v); }); }); });
   function setMusic(v) { save.music = v; persist(); [].forEach.call($('segMusic').children, function (b) { b.setAttribute('aria-pressed', b.dataset.v === v ? 'true' : 'false'); }); }
   [].forEach.call($('segMusic').children, function (b) { b.addEventListener('click', function () { audioStart(); setMusic(b.dataset.v); }); });
 
@@ -809,7 +816,7 @@
     if (u < 1) return;
     if (g.end === 'skip') { STONE.n++; world.splash(g.x1, g.z1, 0.55); SFX.skip(STONE.n); STONE.i++; STONE.t = 0; return; }
     STONE.on = false; STONE.m.visible = false;
-    if (g.end === 'sink') { world.splash(g.x1, g.z1, 1.0); SFX.plop(); } else SFX.clack();
+    if (g.end === 'sink') { world.splash(g.x1, g.z1, 1.0); if (AU.nat) natEvent({ id: 'plop', x: g.x1, z: g.z1, gain: 0.8 }); else SFX.plop(); } else SFX.clack();
     var n = STONE.n, best = n > (save.skip.best || 0) && n > 1;
     save.skip.n = (save.skip.n || 0) + 1; if (n > (save.skip.best || 0)) save.skip.best = n; persist();
     toast(PKWaterFinds.skipLine(n) + (g.end === 'bank' && n > 0 ? ' It fetches up on the far bank.' : '') + (best && save.skip.n > 1 ? ' His best yet.' : ''), 3.4);
@@ -1053,12 +1060,12 @@
         SKY.boltT = 6 + Math.random() * 9; SKY.flash = 1.2;
         var dist = 1 + Math.random() * 2.5;
         if (!save.struck) { save.struck = true; persist(); world.setStruck(true); var L = world.lightning, d2 = Math.hypot(L.x - P.x, L.z - P.z); dist = Math.min(3, d2 / 30); toast(d2 < 45 ? 'Lightning strikes the lone oak by the pond!' : 'A great crack of lightning, somewhere over by the pond.', 4); }
-        SKY.thunder.push(dist);
+        SKY.thunder.push([dist, dist * 0.343]);   // [seconds until it is heard, km away]
       }
-      for (var q = SKY.thunder.length - 1; q >= 0; q--) { SKY.thunder[q] -= dt; if (SKY.thunder[q] <= 0) { SKY.thunder.splice(q, 1); thunder(); } }
+      for (var q = SKY.thunder.length - 1; q >= 0; q--) { var th = SKY.thunder[q]; if (typeof th === 'number') th = SKY.thunder[q] = [th, th * 0.343]; th[0] -= dt; if (th[0] <= 0) { SKY.thunder.splice(q, 1); thunder(th[1]); } }
       if (Math.random() < dt * 14) { var a = Math.random() * 6.28, rr = Math.random() * 9; world.splash(P.x + Math.cos(a) * rr, P.z + Math.sin(a) * rr, 0.35); }
     }
-    if (AU.rain) AU.rain.gain.value = 0.16 * st;
+    if (AU.rain) AU.rain.gain.value = AU.nat ? 0 : 0.16 * st;
   }
   // ================================================================ the look of the valley through the day (the polished version)
   // shade and light are tinted apart: cool shade and warm light at the ends of the day, moonlight blue at night
@@ -1233,7 +1240,31 @@
     }
     RAIN.m.instanceMatrix.needsUpdate = true;
   }
-  function thunder() { if (!AU.ctx) return; noise(2.2, 160, 0.5); noise(0.5, 700, 0.12); }
+  function thunder(km) { if (!AU.ctx) return; if (AU.nat) { AU.nat.call('thunder', { km: km == null ? 1 : km }); return; } noise(2.2, 160, 0.5); noise(0.5, 700, 0.12); }
+  // ---------------------------------------------------------------- the valley's own sounds, each frame (Nov 19)
+  var NATS = { last: {}, cr: new THREE.Vector3() };
+  function natPlace(x, z) {   // how far away, and how far left or right of the view, a spot is
+    var dx = x - P.x, dz = z - P.z, d = Math.hypot(dx, dz) || 1;
+    NATS.cr.set(1, 0, 0).applyQuaternion(cam.quaternion); var rl = Math.hypot(NATS.cr.x, NATS.cr.z) || 1;
+    return { dist: Math.max(2, d), pan: Math.max(-0.9, Math.min(0.9, (dx * NATS.cr.x + dz * NATS.cr.z) / rl / d)) };
+  }
+  function natEvent(ev) {
+    if (!AU.nat || !playing) return; var now = AU.ctx.currentTime;
+    if (NATS.last[ev.id] && now - NATS.last[ev.id] < (ev.id === 'armadillo' ? 0.6 : 1.2)) return;   // a herd of deer snorts as one
+    NATS.last[ev.id] = now; var pl = natPlace(ev.x, ev.z); if (pl.dist > 90) return;
+    AU.nat.call(ev.id, { dist: pl.dist, pan: pl.pan, when: ev.when || 0, gain: ev.gain });
+  }
+  function natUpdate(dt) {
+    var N = AU.nat, fl = save.flow || {}, pond = world.pond, spr = world.spots.spring, fa = world.spots.falls;
+    var quiet = TITLE.on || !playing ? 1 : speechBusy() || (modal && /poem/i.test(modal)) ? 0.4 : 0;
+    N.amb.update(dt, {
+      hour: SKY.hour, storm: LOOK.st, flood: { flood: 1, high: 0.6, normal: 0.3, low: 0.15 }[fl.main] || 0.3,
+      water: world.waterNear(P.x, P.z), pond: pond ? Math.hypot(pond.x - P.x, pond.z - P.z) : 99, spring: spr ? Math.hypot(spr.x - P.x, spr.z - P.z) : 99,
+      falls: fa && fl.dry === 'running' ? Math.hypot(fa.x - P.x, fa.z - P.z) : null,
+      fire: ENDING.on || save.done ? Math.min(1, FIRE.amt || 0) * (inCave() ? 1 : 0.3) : 0, cave: inCave(),
+      quiet: quiet, wet: fl.main === 'flood' || fl.main === 'high' ? 1 : 0
+    });
+  }
   function rainStart() {
     if (AU.rain || !AU.ctx) return;
     try { var C = AU.ctx, len = C.sampleRate * 2, b = C.createBuffer(1, len, C.sampleRate), d = b.getChannelData(0); for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1; var s = C.createBufferSource(); s.buffer = b; s.loop = true; var f = C.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 2200; var g = C.createGain(); g.gain.value = 0; s.connect(f); f.connect(g); g.connect(AU.master); s.start(); AU.rain = g; } catch (e) {}
@@ -1767,7 +1798,7 @@
   }
   function easyZoom() { var ez = Math.max(1, Math.min(2.4, Math.min(window.innerWidth / 800, window.innerHeight / 520))); document.documentElement.style.setProperty('--ez', ez.toFixed(2)); }
   function setEasy(on) {
-    EASY.on = !!on; save.see = EASY.on; persist();
+    EASY.on = !!on; save.see = EASY.on; persist(); natMix();
     document.body.classList.toggle('easy', EASY.on);
     world.setPlants(!EASY.on);
     var cd = QUAL[save.quality].creek; setCreekDetail(EASY.on ? Math.min(cd, 2) : cd);
@@ -2323,9 +2354,9 @@
     ITEMS.forEach(function (f, i) { var o = findObj[f.id]; if (!o.g.visible) return; o.glint.rotation.y = time * 1.6 + i; o.glint.position.y = 0.72 + 0.08 * Math.sin(time * 2.4 + i); var s = (0.8 + 0.25 * Math.max(0, Math.sin(time * 3 + i * 1.7))) * (PON.t > 0 && PON.shimmer.indexOf(o) >= 0 ? 1.8 : 1) * (EASY.on ? 2.2 : 1); o.glint.scale.setScalar(s); });
     POEMS.forEach(function (pm, i) { var o = poemObj[pm.id]; o.g.rotation.y = time * 0.9 + i; o.g.position.y = o.base + 0.07 * Math.sin(time * 1.8 + i) + (EASY.on ? 0.35 : 0); o.g.scale.setScalar(EASY.on ? 2.2 : 1); o.g.visible = !(P.lock === 'read' && nearPoem() === pm); });
     life.update(time, dt, { x: P.x, z: P.z, y: P.y, lamp: !!save.tools.lantern && isNight() && !ENDING.on, ending: ENDING.on, wading: P.wade, hour: SKY.hour, storm: save.weather === 'storm' || LOOK.st > 0.4, camDir: [Math.sin(view.az), Math.cos(view.az)] });
-    while (life.events.length) { var ev = life.events.shift(); if (ev.type === 'hoot') { BIRDS.hoot(ev.near); continue; } if (ev.type === 'bassPlop') { if (ev.near < 14) SFX.plop(); continue; } if (ev.type === 'bassJump' && ev.near < 14) SFX.splash(); if ((ev.type !== 'heron' && ev.type !== 'bassJump' || ev.first) && LINES[ev.type]) toast(LINES[ev.type]); if (ev.type === 'turtles' || ev.type === 'frog') SFX.plop(); }
-    BIRDS.update(dt); musicUpdate(dt);
-    if (AU.creek) { var near = Math.max(0, 1 - world.waterNear(P.x, P.z) / 10); AU.creek.gain.value = 0.02 + 0.07 * near * near; }
+    while (life.events.length) { var ev = life.events.shift(); if (ev.type === 'snd') { natEvent(ev); continue; } if (ev.type === 'hoot') { if (!AU.nat) BIRDS.hoot(ev.near); continue; } if (ev.type === 'bassPlop') { if (ev.near < 14 && !AU.nat) SFX.plop(); continue; } if (ev.type === 'bassJump' && ev.near < 14 && !AU.nat) SFX.splash(); if ((ev.type !== 'heron' && ev.type !== 'bassJump' || ev.first) && LINES[ev.type]) toast(LINES[ev.type]); if (ev.type === 'turtles' || ev.type === 'frog') SFX.plop(); }
+    if (AU.nat) natUpdate(dt); else { BIRDS.update(dt); if (AU.creek) { var near = Math.max(0, 1 - world.waterNear(P.x, P.z) / 10); AU.creek.gain.value = 0.02 + 0.07 * near * near; } }
+    musicUpdate(dt);
 
     view.az += (view.azGoal - view.az) * (1 - Math.exp(-dt * 6));
     view.el += (view.elGoal - view.el) * (1 - Math.exp(-dt * 6));
@@ -2403,7 +2434,7 @@
   // ---------------------------------------------------------------- start
   window.addEventListener('resize', resize);
   document.body.classList.toggle('easy', EASY.on); easyZoom(); marks('segEasy', EASY.on ? 'on' : 'off'); $('bEasy').setAttribute('aria-pressed', EASY.on ? 'true' : 'false'); $('bEasy').textContent = EASY.on ? 'Easy to see: on' : 'Easy to see: off';
-  resize(); setMap(save.map); setPix(save.pix); setSound(save.sound); setVoice(!!save.voice); setMusic(save.music || 'normal'); counts(); markDet(); wallUpdate();
+  resize(); setMap(save.map); setPix(save.pix); setSound(save.sound); setVoice(!!save.voice); setMusic(save.music || 'normal'); setNat('nature', save.nature || 'normal'); setNat('wind', save.wind || 'normal'); counts(); markDet(); wallUpdate();
   reveal(P.x, P.z, 17);
   $('loadline').textContent = 'Ready when you are.';
   if (!$('intro').hidden) titleBegin();
@@ -2425,7 +2456,7 @@
     step: function (sec, fps) { var h = 1 / (fps || 30); for (var t = 0; t < sec - 1e-6; t += h) update(h); render(); },
     tick: function (sec, fps) { var h = 1 / (fps || 30); for (var t = 0; t < sec - 1e-6; t += h) update(h); },
     render: render, openMap: openMap, reveal: reveal, blocked: blocked, sky: SKY, rest: function (seatId, target) { restSeat = SEATS.filter(function (q) { return q.id === seatId; })[0] || { x: P.x, z: P.z, y: P.y, face: P.yaw, label: 'here' }; rest(target); }, seats: SEATS, startStorm: function () { startStorm(); }, endStorm: function () { endStorm(); }, setHour: function (h) { SKY.hour = h; save.hour = h; }, openStudio: openStudio, journal: function () { journal(); openModal('journalVeil'); }, icon: icon, findObj: findObj, available: available, pickUp: pickUp, setWave: function (w) { save.wave = w; showFinds(); }, items: ITEMS,
-    closeUp: closeUp, tilt: tilt, resetView: resetView, music: MUS, musicSets: SETS, voiceState: VOICE, rec: rec, recFor: recFor, speak: speak, poemRec: poemRec, speechBusy: speechBusy, musicScene: musicScene, skips: SKIPS, stone: STONE, skipStone: skipStone, nearSkip: nearSkip, noteSeen: noteSeen, field: FIELD, amb: AMB,
+    closeUp: closeUp, tilt: tilt, resetView: resetView, music: MUS, musicSets: SETS, nat: function () { return AU.nat; }, natUpdate: natUpdate, setNat: setNat, voiceState: VOICE, rec: rec, recFor: recFor, speak: speak, poemRec: poemRec, speechBusy: speechBusy, musicScene: musicScene, skips: SKIPS, stone: STONE, skipStone: skipStone, nearSkip: nearSkip, noteSeen: noteSeen, field: FIELD, amb: AMB,
     ponder: ponder, say: say, voice: setVoice, PON: PON, easy: setEasy, EASY: EASY,
     watch: { start: watchStart, stop: watchStop, pause: watchPause, skip: watchSkip, state: WATCH, story: STORY },
     guide: { go: guideGo, stop: guideStop, plan: planRoute, next: nextGoal, state: GUIDE, nav: function () { if (!NAV) buildNav(); return NAV; }, lineOK: lineOK },

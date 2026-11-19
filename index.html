@@ -444,6 +444,8 @@
     <div class="setrow"><span class="lab">View</span><div class="seg"><button type="button" id="mTurnL">Turn left</button><button type="button" id="mTurnR">Turn right</button><button type="button" id="mHigher">Higher</button><button type="button" id="mLower">Lower</button><button type="button" id="mZoomIn">Closer</button><button type="button" id="mZoomOut">Farther</button><button type="button" id="mClose">His face</button><button type="button" id="mReset2">Reset view</button></div></div>
     <div class="setrow"><span class="lab">Sound</span><div class="seg" id="segSound"><button type="button" data-v="on">On</button><button type="button" data-v="off">Off</button></div></div>
     <div class="setrow" id="musicRow"><span class="lab">Music</span><div class="seg" id="segMusic"><button type="button" data-v="loud">Louder</button><button type="button" data-v="normal">On</button><button type="button" data-v="quiet">Quiet</button><button type="button" data-v="off">Off</button></div></div>
+    <div class="setrow" id="natureRow"><span class="lab">Nature</span><div class="seg" id="segNature"><button type="button" data-v="soft">Soft</button><button type="button" data-v="normal">Normal</button><button type="button" data-v="loud">Loud</button></div></div>
+    <div class="setrow" id="windRow"><span class="lab">Wind</span><div class="seg" id="segWind"><button type="button" data-v="soft">Soft</button><button type="button" data-v="normal">Normal</button><button type="button" data-v="loud">Loud</button></div></div>
     <div class="setrow"><span class="lab">Easy to see</span><div class="seg" id="segEasy"><button type="button" data-v="on">On</button><button type="button" data-v="off">Off</button></div></div>
     <div class="setrow" id="voiceRow"><span class="lab">Read aloud</span><div class="seg" id="segVoice"><button type="button" data-v="on">On</button><button type="button" data-v="off">Off</button></div></div>
     <div class="setrow"><span class="lab">More</span><div class="seg"><button type="button" id="mWatch">Watch the story</button><button type="button" id="mPhoto">Photo mode</button><button type="button" id="mCard">Character card</button><button type="button" id="mHelp">Controls</button></div></div>
@@ -4696,7 +4698,7 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
     // at night
     { id: 'owl', name: 'Great horned owl', group: 'At night', where: 'On the trestle and in the far trees; sometimes a second one answers.', old: true },
     { id: 'chuck', name: "Chuck-will's-widow", group: 'At night', where: 'Far off, after dark and before dawn.' },
-    { id: 'coyote', name: 'Coyotes', group: 'At night', where: 'Very far off, once in a long while. Off in the game unless you turn it on.', off: true },
+    { id: 'coyote', name: 'Coyotes', group: 'At night', where: 'Very far off, once in a long while.' },
     // animals moving
     { id: 'deer', name: 'Deer snort and bound away', group: 'Animals moving', where: 'When the deer see him coming.' },
     { id: 'armadillo', name: 'Armadillo in the leaves', group: 'Animals moving', where: 'Along the trail, evening and night.' },
@@ -4769,7 +4771,8 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
   }
 
   function make(ctx, dest) {
-    var N = { ctx: ctx, user: {}, META: META, LEVEL: LEVEL, RANGE: RANGE, beds: {}, live: [] };
+    // mix: the game's two settings, Nature (every creature, the water and the weather) and Wind (on its own)
+    var N = { ctx: ctx, user: {}, META: META, LEVEL: LEVEL, RANGE: RANGE, beds: {}, live: [], mix: { nature: 1, wind: 1 } };
     var out = ctx.createGain(); out.gain.value = 1;
     var lim = ctx.createDynamicsCompressor(); lim.threshold.value = -12; lim.knee.value = 8; lim.ratio.value = 6; lim.attack.value = 0.004; lim.release.value = 0.3;
     out.connect(lim); lim.connect(dest || ctx.destination);
@@ -4778,7 +4781,7 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
     N.out = out; N.legacyOut = legacyOut;
     var NB = { white: noiseBuf(ctx, 'white', 4), pink: noiseBuf(ctx, 'pink', 4), brown: noiseBuf(ctx, 'brown', 4) };
 
-    function userGain(id) { var u = N.user[id], m = BYID[id]; if (u && u.on === false) return 0; if (!u && m && m.off) return 0; return (u && u.gain != null ? u.gain : 1) * db(LEVEL[id] || 0); }
+    function userGain(id) { var u = N.user[id], m = BYID[id]; if (u && u.on === false) return 0; if (!u && m && m.off) return 0; return (u && u.gain != null ? u.gain : 1) * db(LEVEL[id] || 0) * (id === 'wind' ? N.mix.wind : N.mix.nature); }
     N.userGain = userGain;
     // the one chain every sound goes through
     function chain(o) {
@@ -7591,7 +7594,7 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
       h.dur = 2.4 + Math.hypot(h.to.x - h.from.x, h.to.z - h.from.z) / 7; h.perch = best; h.state = 'fly'; h.t = 0;
       h.wings.forEach(function (w) { w.visible = true; });
       world.splash(h.from.x, h.from.z, 1.2);
-      events.push({ type: 'heron', first: !h.startled++ });
+      events.push({ type: 'heron', first: !h.startled++ }); snd('heron', h.from.x, h.from.z);
     }
 
     // ---------------- turtles on the log at the pond's edge
@@ -7613,7 +7616,7 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
         var d = Math.hypot(tu.home.x - k.x, tu.home.z - k.z); tu.t += dt;
         if (tu.state === 'bask') {
           tu.g.visible = true; tu.g.position.set(tu.home.x, tu.home.y, tu.home.z); tu.head.position.z = 0.15 + 0.02 * Math.sin(t * 0.7 + idx);
-          if (d < 3.0 + idx * 0.4) { tu.state = 'plop'; tu.t = 0; if (!turtleTold) { turtleTold = true; events.push({ type: 'turtles' }); } }
+          if (d < 3.0 + idx * 0.4) { tu.state = 'plop'; tu.t = 0; snd('plop', tu.home.x, tu.home.z, { when: 0.35 + idx * 0.2 }); if (!turtleTold) { turtleTold = true; events.push({ type: 'turtles' }); } }
         } else if (tu.state === 'plop') {
           var u = clamp(tu.t / 0.45, 0, 1), fw = Math.sin(tu.home.yaw), fz = Math.cos(tu.home.yaw);
           tu.g.position.set(tu.home.x + fw * 0.3 * u, tu.home.y - 0.35 * u * u, tu.home.z + fz * 0.3 * u); tu.g.rotation.x = 0.6 * u;
@@ -7679,7 +7682,7 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
         var d = Math.hypot(f.home.x - k.x, f.home.z - k.z); f.t += dt;
         if (f.state === 'sit') {
           f.g.visible = true; f.g.position.set(f.home.x, f.home.y + 0.004 * Math.sin(t * 9 + f.home.x), f.home.z);
-          if (d < 1.9) { f.state = 'hop'; f.t = 0; f.to = { x: f.home.x + Math.sin(f.yaw) * 0.9, z: f.home.z + Math.cos(f.yaw) * 0.9 }; f.g.rotation.y = f.yaw; if (!frogTold) { frogTold = true; events.push({ type: 'frog' }); } }
+          if (d < 1.9) { f.state = 'hop'; f.t = 0; f.to = { x: f.home.x + Math.sin(f.yaw) * 0.9, z: f.home.z + Math.cos(f.yaw) * 0.9 }; f.g.rotation.y = f.yaw; snd('plop', f.to.x, f.to.z, { when: 0.3, gain: 0.6 }); if (!frogTold) { frogTold = true; events.push({ type: 'frog' }); } }
         } else if (f.state === 'hop') {
           var u = clamp(f.t / 0.5, 0, 1), wl = waterAt(f.to.x, f.to.z);
           f.g.position.set(f.home.x + (f.to.x - f.home.x) * u, f.home.y + (wl - f.home.y) * u + 0.45 * Math.sin(Math.PI * u), f.home.z + (f.to.z - f.home.z) * u);
@@ -7767,7 +7770,7 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
         if (dk > 36) { d.g.visible = false; return; }
         var wl = world.water(h.x, h.z); d.g.visible = wl != null; if (wl == null) return;
         var px = d.g.position.x, pz = d.g.position.z;
-        if (Math.hypot(px - k.x, pz - k.z) < 2.0) { if (!d.flee && !duckTold) { duckTold = true; events.push({ type: 'teal' }); } d.flee = 2.5; }
+        if (Math.hypot(px - k.x, pz - k.z) < 2.0) { if (!d.flee) snd('teal', px, pz); if (!d.flee && !duckTold) { duckTold = true; events.push({ type: 'teal' }); } d.flee = 2.5; }
         d.flee = Math.max(0, d.flee - dt);
         d.a += d.sp * dt * (d.flee > 0 ? 3 : 1) / Math.max(0.3, d.r);
         var x = h.x + Math.cos(d.a) * d.r, z = h.z + Math.sin(d.a) * d.r * (d.si === 0 ? 1.1 : 0.7);
@@ -7891,7 +7894,7 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
       owl.g.rotation.y = Math.atan2(k.x - OWLAT.x, k.z - OWLAT.z) * 0.3 + Math.PI * 0.5;
       owl.lookT -= dt; if (owl.lookT <= 0) { owl.lookT = 2 + Math.random() * 4; owl.look = (Math.random() - 0.5) * 2.6; }
       owl.head.rotation.y += (owl.look - owl.head.rotation.y) * Math.min(1, dt * 3);
-      owl.hoot -= dt; if (owl.hoot <= 0 && d < 28) { owl.hoot = 9 + Math.random() * 12; events.push({ type: 'hoot', near: d }); }
+      owl.hoot -= dt; if (owl.hoot <= 0 && d < 28) { owl.hoot = 9 + Math.random() * 12; events.push({ type: 'hoot', near: d }); snd('owl', OWLAT.x, OWLAT.z); }
     }
     // ---------------- white-tailed deer at dusk and dawn, grazing in the meadow; they bound off when he comes near
     function deerMesh(sc) {
@@ -7919,7 +7922,7 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
         if (d.away > 0) { d.away -= dt; if (d.away <= 0) { d.hx = HERD.x + (R() - 0.5) * 6; d.hz = HERD.z + (R() - 0.5) * 5; } d.g.visible = false; return; }
         d.g.visible = true;
         var dk = Math.hypot(d.hx - k.x, d.hz - k.z);
-        if (dk < 5.5 && !d.flee) { d.flee = 2.6; d.fx = (d.hx - k.x) / (dk || 1); d.fz = (d.hz - k.z) / (dk || 1); d.yaw = Math.atan2(d.fx, d.fz); if (!deerTold) { deerTold = true; events.push({ type: 'deer' }); } }
+        if (dk < 5.5 && !d.flee) { snd('deer', d.hx, d.hz); d.flee = 2.6; d.fx = (d.hx - k.x) / (dk || 1); d.fz = (d.hz - k.z) / (dk || 1); d.yaw = Math.atan2(d.fx, d.fz); if (!deerTold) { deerTold = true; events.push({ type: 'deer' }); } }
         if (d.flee > 0) {
           // bounding: a leap every half second, tail up and white
           d.flee -= dt; d.hx += d.fx * dt * 6.5; d.hz += d.fz * dt * 6.5;
@@ -7963,6 +7966,8 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
       card.g.rotation.x = card.hopT > 0.4 && Math.sin(t * 5) > 0.7 ? 0.5 : 0;   // a peck
     }
 
+    // a sound, every time it happens, from where it happens (Nov 19: the game plays it with PKNature)
+    function snd(id, x, z, o) { var e = { type: 'snd', id: id, x: x, z: z }; if (o) for (var q in o) e[q] = o[q]; events.push(e); }
     // ================================================================ more of the valley's life (the upgrade pass, Nov 18)
     // ---------------- bats: at dusk they pour out of the cave under the bluff and away down the creek; at night a few hunt over the water near him
     var BATS = (function () {
@@ -8023,7 +8028,8 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
       var a = dillo; if (!DILLOAT) return; var h = k.hour == null ? 12 : ((k.hour % 24) + 24) % 24, on = (h > 18.2 || h < 6.2) && !k.storm;
       a.g.visible = on && Math.hypot(a.x - k.x, a.z - k.z) < 60; if (!a.g.visible) { a.jump = -1; a.flee = 0; return; }
       var dk = Math.hypot(a.x - k.x, a.z - k.z), hop = 0, sp = 0.22, walk = true;
-      if (a.jump < 0 && a.flee <= 0 && dk < 2.5) { a.jump = 0; a.fx = (a.x - k.x) / (dk || 1); a.fz = (a.z - k.z) / (dk || 1); if (!a.told) { a.told = true; events.push({ type: 'armadillo' }); } }
+      a.rustT = (a.rustT || 2) - dt; if (a.rustT <= 0 && dk < 10 && a.jump < 0) { a.rustT = a.flee > 0 ? 0.9 : 2.5 + R() * 3; snd('armadillo', a.x, a.z); }   // rooting in the leaves, and scuttling off
+      if (a.jump < 0 && a.flee <= 0 && dk < 2.5) { snd('armadillo', a.x, a.z, { gain: 1.4 }); a.jump = 0; a.fx = (a.x - k.x) / (dk || 1); a.fz = (a.z - k.z) / (dk || 1); if (!a.told) { a.told = true; events.push({ type: 'armadillo' }); } }
       if (a.jump >= 0) {           // straight up, as armadillos do when startled
         a.jump += dt; var u = a.jump / 0.5; hop = Math.sin(Math.min(1, u) * Math.PI) * 0.6; walk = false;
         if (u >= 1) { a.jump = -1; a.flee = 2.8; a.yaw = Math.atan2(a.fx, a.fz); }
@@ -8093,12 +8099,12 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
         b.wait = 9 + R() * 12;
         for (var tries = 0; tries < 8; tries++) {
           var a = R() * 6.28, rr = R() * 2.4, x = BASSAT.x + Math.cos(a) * rr, z = BASSAT.z + Math.sin(a) * rr, yaw = R() * 6.28, wl = world.water(x, z), wl2 = world.water(x + Math.sin(yaw) * 1.1, z + Math.cos(yaw) * 1.1);
-          if (wl != null && wl2 != null && wl - world.height(x, z) > 0.25) { b.x = x; b.z = z; b.yaw = yaw; b.wl = wl; b.t = 0; world.splash(x, z, 1.1); events.push({ type: 'bassJump', near: dk, first: !b.told && dk < 12 }); if (dk < 12) b.told = true; break; }
+          if (wl != null && wl2 != null && wl - world.height(x, z) > 0.25) { b.x = x; b.z = z; b.yaw = yaw; b.wl = wl; b.t = 0; world.splash(x, z, 1.1); snd('splash', x, z); events.push({ type: 'bassJump', near: dk, first: !b.told && dk < 12 }); if (dk < 12) b.told = true; break; }
         }
         return;
       }
       b.t += dt; var u = b.t / 0.85;
-      if (u >= 1) { b.t = -1; b.g.visible = false; world.splash(b.x + Math.sin(b.yaw) * 1.1, b.z + Math.cos(b.yaw) * 1.1, 1.5); events.push({ type: 'bassPlop', near: dk }); return; }
+      if (u >= 1) { b.t = -1; b.g.visible = false; world.splash(b.x + Math.sin(b.yaw) * 1.1, b.z + Math.cos(b.yaw) * 1.1, 1.5); snd('splash', b.x + Math.sin(b.yaw) * 1.1, b.z + Math.cos(b.yaw) * 1.1, { gain: 0.7 }); events.push({ type: 'bassPlop', near: dk }); return; }
       b.g.visible = true;
       b.g.position.set(b.x + Math.sin(b.yaw) * 1.1 * u, b.wl - 0.1 + Math.sin(u * Math.PI) * 0.62, b.z + Math.cos(b.yaw) * 1.1 * u);
       b.g.rotation.set(-1.15 * Math.cos(u * Math.PI), b.yaw, 0.5 * Math.sin(u * 9), 'YXZ');
@@ -8375,6 +8381,8 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
       var g = C.createGain(); g.gain.value = 0.0;
       src.connect(bp); bp.connect(g); g.connect(AU.master); src.start();
       AU.creek = g;
+      // the valley's own sounds (Nov 19): every creature, the water, the wind and the weather (src/25_nature.js)
+      if (window.PKNature) { AU.nat = PKNature.make(C, AU.master); natMix(); }
     } catch (e) { AU.ctx = null; }
   }
   function tone(freq, t0, dur, vol, type, pan) {
@@ -8456,6 +8464,11 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
   }
   // sound can only start after a touch, a click or a key: the first one, anywhere (the title too), starts it
   ['pointerdown', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function first() { audioStart(); if (AU.ctx && AU.ctx.state === 'suspended') AU.ctx.resume(); }, { once: true, capture: true }); });
+  // Nature and Wind (Nov 19): Soft is half as loud as Normal (-6 dB), Loud nearly twice (+5 dB). Easy to see keeps them a little lower, under the voice.
+  var NATLV = { soft: 0.5, normal: 1, loud: 1.8 };
+  function natMix() { if (!AU.nat) return; var e = EASY && EASY.on ? 0.7 : 1; AU.nat.mix.nature = (NATLV[save.nature] || 1) * e; AU.nat.mix.wind = (NATLV[save.wind] || 1) * e; }
+  function setNat(k, v) { save[k] = v; persist(); natMix(); [].forEach.call($(k === 'wind' ? 'segWind' : 'segNature').children, function (b) { b.setAttribute('aria-pressed', b.dataset.v === v ? 'true' : 'false'); }); }
+  ['nature', 'wind'].forEach(function (k) { [].forEach.call($(k === 'wind' ? 'segWind' : 'segNature').children, function (b) { b.addEventListener('click', function () { audioStart(); setNat(k, b.dataset.v); }); }); });
   function setMusic(v) { save.music = v; persist(); [].forEach.call($('segMusic').children, function (b) { b.setAttribute('aria-pressed', b.dataset.v === v ? 'true' : 'false'); }); }
   [].forEach.call($('segMusic').children, function (b) { b.addEventListener('click', function () { audioStart(); setMusic(b.dataset.v); }); });
 
@@ -8957,7 +8970,7 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
     if (u < 1) return;
     if (g.end === 'skip') { STONE.n++; world.splash(g.x1, g.z1, 0.55); SFX.skip(STONE.n); STONE.i++; STONE.t = 0; return; }
     STONE.on = false; STONE.m.visible = false;
-    if (g.end === 'sink') { world.splash(g.x1, g.z1, 1.0); SFX.plop(); } else SFX.clack();
+    if (g.end === 'sink') { world.splash(g.x1, g.z1, 1.0); if (AU.nat) natEvent({ id: 'plop', x: g.x1, z: g.z1, gain: 0.8 }); else SFX.plop(); } else SFX.clack();
     var n = STONE.n, best = n > (save.skip.best || 0) && n > 1;
     save.skip.n = (save.skip.n || 0) + 1; if (n > (save.skip.best || 0)) save.skip.best = n; persist();
     toast(PKWaterFinds.skipLine(n) + (g.end === 'bank' && n > 0 ? ' It fetches up on the far bank.' : '') + (best && save.skip.n > 1 ? ' His best yet.' : ''), 3.4);
@@ -9201,12 +9214,12 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
         SKY.boltT = 6 + Math.random() * 9; SKY.flash = 1.2;
         var dist = 1 + Math.random() * 2.5;
         if (!save.struck) { save.struck = true; persist(); world.setStruck(true); var L = world.lightning, d2 = Math.hypot(L.x - P.x, L.z - P.z); dist = Math.min(3, d2 / 30); toast(d2 < 45 ? 'Lightning strikes the lone oak by the pond!' : 'A great crack of lightning, somewhere over by the pond.', 4); }
-        SKY.thunder.push(dist);
+        SKY.thunder.push([dist, dist * 0.343]);   // [seconds until it is heard, km away]
       }
-      for (var q = SKY.thunder.length - 1; q >= 0; q--) { SKY.thunder[q] -= dt; if (SKY.thunder[q] <= 0) { SKY.thunder.splice(q, 1); thunder(); } }
+      for (var q = SKY.thunder.length - 1; q >= 0; q--) { var th = SKY.thunder[q]; if (typeof th === 'number') th = SKY.thunder[q] = [th, th * 0.343]; th[0] -= dt; if (th[0] <= 0) { SKY.thunder.splice(q, 1); thunder(th[1]); } }
       if (Math.random() < dt * 14) { var a = Math.random() * 6.28, rr = Math.random() * 9; world.splash(P.x + Math.cos(a) * rr, P.z + Math.sin(a) * rr, 0.35); }
     }
-    if (AU.rain) AU.rain.gain.value = 0.16 * st;
+    if (AU.rain) AU.rain.gain.value = AU.nat ? 0 : 0.16 * st;
   }
   // ================================================================ the look of the valley through the day (the polished version)
   // shade and light are tinted apart: cool shade and warm light at the ends of the day, moonlight blue at night
@@ -9381,7 +9394,31 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
     }
     RAIN.m.instanceMatrix.needsUpdate = true;
   }
-  function thunder() { if (!AU.ctx) return; noise(2.2, 160, 0.5); noise(0.5, 700, 0.12); }
+  function thunder(km) { if (!AU.ctx) return; if (AU.nat) { AU.nat.call('thunder', { km: km == null ? 1 : km }); return; } noise(2.2, 160, 0.5); noise(0.5, 700, 0.12); }
+  // ---------------------------------------------------------------- the valley's own sounds, each frame (Nov 19)
+  var NATS = { last: {}, cr: new THREE.Vector3() };
+  function natPlace(x, z) {   // how far away, and how far left or right of the view, a spot is
+    var dx = x - P.x, dz = z - P.z, d = Math.hypot(dx, dz) || 1;
+    NATS.cr.set(1, 0, 0).applyQuaternion(cam.quaternion); var rl = Math.hypot(NATS.cr.x, NATS.cr.z) || 1;
+    return { dist: Math.max(2, d), pan: Math.max(-0.9, Math.min(0.9, (dx * NATS.cr.x + dz * NATS.cr.z) / rl / d)) };
+  }
+  function natEvent(ev) {
+    if (!AU.nat || !playing) return; var now = AU.ctx.currentTime;
+    if (NATS.last[ev.id] && now - NATS.last[ev.id] < (ev.id === 'armadillo' ? 0.6 : 1.2)) return;   // a herd of deer snorts as one
+    NATS.last[ev.id] = now; var pl = natPlace(ev.x, ev.z); if (pl.dist > 90) return;
+    AU.nat.call(ev.id, { dist: pl.dist, pan: pl.pan, when: ev.when || 0, gain: ev.gain });
+  }
+  function natUpdate(dt) {
+    var N = AU.nat, fl = save.flow || {}, pond = world.pond, spr = world.spots.spring, fa = world.spots.falls;
+    var quiet = TITLE.on || !playing ? 1 : speechBusy() || (modal && /poem/i.test(modal)) ? 0.4 : 0;
+    N.amb.update(dt, {
+      hour: SKY.hour, storm: LOOK.st, flood: { flood: 1, high: 0.6, normal: 0.3, low: 0.15 }[fl.main] || 0.3,
+      water: world.waterNear(P.x, P.z), pond: pond ? Math.hypot(pond.x - P.x, pond.z - P.z) : 99, spring: spr ? Math.hypot(spr.x - P.x, spr.z - P.z) : 99,
+      falls: fa && fl.dry === 'running' ? Math.hypot(fa.x - P.x, fa.z - P.z) : null,
+      fire: ENDING.on || save.done ? Math.min(1, FIRE.amt || 0) * (inCave() ? 1 : 0.3) : 0, cave: inCave(),
+      quiet: quiet, wet: fl.main === 'flood' || fl.main === 'high' ? 1 : 0
+    });
+  }
   function rainStart() {
     if (AU.rain || !AU.ctx) return;
     try { var C = AU.ctx, len = C.sampleRate * 2, b = C.createBuffer(1, len, C.sampleRate), d = b.getChannelData(0); for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1; var s = C.createBufferSource(); s.buffer = b; s.loop = true; var f = C.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 2200; var g = C.createGain(); g.gain.value = 0; s.connect(f); f.connect(g); g.connect(AU.master); s.start(); AU.rain = g; } catch (e) {}
@@ -9915,7 +9952,7 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
   }
   function easyZoom() { var ez = Math.max(1, Math.min(2.4, Math.min(window.innerWidth / 800, window.innerHeight / 520))); document.documentElement.style.setProperty('--ez', ez.toFixed(2)); }
   function setEasy(on) {
-    EASY.on = !!on; save.see = EASY.on; persist();
+    EASY.on = !!on; save.see = EASY.on; persist(); natMix();
     document.body.classList.toggle('easy', EASY.on);
     world.setPlants(!EASY.on);
     var cd = QUAL[save.quality].creek; setCreekDetail(EASY.on ? Math.min(cd, 2) : cd);
@@ -10471,9 +10508,9 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
     ITEMS.forEach(function (f, i) { var o = findObj[f.id]; if (!o.g.visible) return; o.glint.rotation.y = time * 1.6 + i; o.glint.position.y = 0.72 + 0.08 * Math.sin(time * 2.4 + i); var s = (0.8 + 0.25 * Math.max(0, Math.sin(time * 3 + i * 1.7))) * (PON.t > 0 && PON.shimmer.indexOf(o) >= 0 ? 1.8 : 1) * (EASY.on ? 2.2 : 1); o.glint.scale.setScalar(s); });
     POEMS.forEach(function (pm, i) { var o = poemObj[pm.id]; o.g.rotation.y = time * 0.9 + i; o.g.position.y = o.base + 0.07 * Math.sin(time * 1.8 + i) + (EASY.on ? 0.35 : 0); o.g.scale.setScalar(EASY.on ? 2.2 : 1); o.g.visible = !(P.lock === 'read' && nearPoem() === pm); });
     life.update(time, dt, { x: P.x, z: P.z, y: P.y, lamp: !!save.tools.lantern && isNight() && !ENDING.on, ending: ENDING.on, wading: P.wade, hour: SKY.hour, storm: save.weather === 'storm' || LOOK.st > 0.4, camDir: [Math.sin(view.az), Math.cos(view.az)] });
-    while (life.events.length) { var ev = life.events.shift(); if (ev.type === 'hoot') { BIRDS.hoot(ev.near); continue; } if (ev.type === 'bassPlop') { if (ev.near < 14) SFX.plop(); continue; } if (ev.type === 'bassJump' && ev.near < 14) SFX.splash(); if ((ev.type !== 'heron' && ev.type !== 'bassJump' || ev.first) && LINES[ev.type]) toast(LINES[ev.type]); if (ev.type === 'turtles' || ev.type === 'frog') SFX.plop(); }
-    BIRDS.update(dt); musicUpdate(dt);
-    if (AU.creek) { var near = Math.max(0, 1 - world.waterNear(P.x, P.z) / 10); AU.creek.gain.value = 0.02 + 0.07 * near * near; }
+    while (life.events.length) { var ev = life.events.shift(); if (ev.type === 'snd') { natEvent(ev); continue; } if (ev.type === 'hoot') { if (!AU.nat) BIRDS.hoot(ev.near); continue; } if (ev.type === 'bassPlop') { if (ev.near < 14 && !AU.nat) SFX.plop(); continue; } if (ev.type === 'bassJump' && ev.near < 14 && !AU.nat) SFX.splash(); if ((ev.type !== 'heron' && ev.type !== 'bassJump' || ev.first) && LINES[ev.type]) toast(LINES[ev.type]); if (ev.type === 'turtles' || ev.type === 'frog') SFX.plop(); }
+    if (AU.nat) natUpdate(dt); else { BIRDS.update(dt); if (AU.creek) { var near = Math.max(0, 1 - world.waterNear(P.x, P.z) / 10); AU.creek.gain.value = 0.02 + 0.07 * near * near; } }
+    musicUpdate(dt);
 
     view.az += (view.azGoal - view.az) * (1 - Math.exp(-dt * 6));
     view.el += (view.elGoal - view.el) * (1 - Math.exp(-dt * 6));
@@ -10551,7 +10588,7 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
   // ---------------------------------------------------------------- start
   window.addEventListener('resize', resize);
   document.body.classList.toggle('easy', EASY.on); easyZoom(); marks('segEasy', EASY.on ? 'on' : 'off'); $('bEasy').setAttribute('aria-pressed', EASY.on ? 'true' : 'false'); $('bEasy').textContent = EASY.on ? 'Easy to see: on' : 'Easy to see: off';
-  resize(); setMap(save.map); setPix(save.pix); setSound(save.sound); setVoice(!!save.voice); setMusic(save.music || 'normal'); counts(); markDet(); wallUpdate();
+  resize(); setMap(save.map); setPix(save.pix); setSound(save.sound); setVoice(!!save.voice); setMusic(save.music || 'normal'); setNat('nature', save.nature || 'normal'); setNat('wind', save.wind || 'normal'); counts(); markDet(); wallUpdate();
   reveal(P.x, P.z, 17);
   $('loadline').textContent = 'Ready when you are.';
   if (!$('intro').hidden) titleBegin();
@@ -10573,7 +10610,7 @@ window.PKCardAssets = {"art": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
     step: function (sec, fps) { var h = 1 / (fps || 30); for (var t = 0; t < sec - 1e-6; t += h) update(h); render(); },
     tick: function (sec, fps) { var h = 1 / (fps || 30); for (var t = 0; t < sec - 1e-6; t += h) update(h); },
     render: render, openMap: openMap, reveal: reveal, blocked: blocked, sky: SKY, rest: function (seatId, target) { restSeat = SEATS.filter(function (q) { return q.id === seatId; })[0] || { x: P.x, z: P.z, y: P.y, face: P.yaw, label: 'here' }; rest(target); }, seats: SEATS, startStorm: function () { startStorm(); }, endStorm: function () { endStorm(); }, setHour: function (h) { SKY.hour = h; save.hour = h; }, openStudio: openStudio, journal: function () { journal(); openModal('journalVeil'); }, icon: icon, findObj: findObj, available: available, pickUp: pickUp, setWave: function (w) { save.wave = w; showFinds(); }, items: ITEMS,
-    closeUp: closeUp, tilt: tilt, resetView: resetView, music: MUS, musicSets: SETS, voiceState: VOICE, rec: rec, recFor: recFor, speak: speak, poemRec: poemRec, speechBusy: speechBusy, musicScene: musicScene, skips: SKIPS, stone: STONE, skipStone: skipStone, nearSkip: nearSkip, noteSeen: noteSeen, field: FIELD, amb: AMB,
+    closeUp: closeUp, tilt: tilt, resetView: resetView, music: MUS, musicSets: SETS, nat: function () { return AU.nat; }, natUpdate: natUpdate, setNat: setNat, voiceState: VOICE, rec: rec, recFor: recFor, speak: speak, poemRec: poemRec, speechBusy: speechBusy, musicScene: musicScene, skips: SKIPS, stone: STONE, skipStone: skipStone, nearSkip: nearSkip, noteSeen: noteSeen, field: FIELD, amb: AMB,
     ponder: ponder, say: say, voice: setVoice, PON: PON, easy: setEasy, EASY: EASY,
     watch: { start: watchStart, stop: watchStop, pause: watchPause, skip: watchSkip, state: WATCH, story: STORY },
     guide: { go: guideGo, stop: guideStop, plan: planRoute, next: nextGoal, state: GUIDE, nav: function () { if (!NAV) buildNav(); return NAV; }, lineOK: lineOK },

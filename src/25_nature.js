@@ -46,7 +46,7 @@
     // at night
     { id: 'owl', name: 'Great horned owl', group: 'At night', where: 'On the trestle and in the far trees; sometimes a second one answers.', old: true },
     { id: 'chuck', name: "Chuck-will's-widow", group: 'At night', where: 'Far off, after dark and before dawn.' },
-    { id: 'coyote', name: 'Coyotes', group: 'At night', where: 'Very far off, once in a long while. Off in the game unless you turn it on.', off: true },
+    { id: 'coyote', name: 'Coyotes', group: 'At night', where: 'Very far off, once in a long while.' },
     // animals moving
     { id: 'deer', name: 'Deer snort and bound away', group: 'Animals moving', where: 'When the deer see him coming.' },
     { id: 'armadillo', name: 'Armadillo in the leaves', group: 'Animals moving', where: 'Along the trail, evening and night.' },
@@ -119,7 +119,8 @@
   }
 
   function make(ctx, dest) {
-    var N = { ctx: ctx, user: {}, META: META, LEVEL: LEVEL, RANGE: RANGE, beds: {}, live: [] };
+    // mix: the game's two settings, Nature (every creature, the water and the weather) and Wind (on its own)
+    var N = { ctx: ctx, user: {}, META: META, LEVEL: LEVEL, RANGE: RANGE, beds: {}, live: [], mix: { nature: 1, wind: 1 } };
     var out = ctx.createGain(); out.gain.value = 1;
     var lim = ctx.createDynamicsCompressor(); lim.threshold.value = -12; lim.knee.value = 8; lim.ratio.value = 6; lim.attack.value = 0.004; lim.release.value = 0.3;
     out.connect(lim); lim.connect(dest || ctx.destination);
@@ -128,7 +129,7 @@
     N.out = out; N.legacyOut = legacyOut;
     var NB = { white: noiseBuf(ctx, 'white', 4), pink: noiseBuf(ctx, 'pink', 4), brown: noiseBuf(ctx, 'brown', 4) };
 
-    function userGain(id) { var u = N.user[id], m = BYID[id]; if (u && u.on === false) return 0; if (!u && m && m.off) return 0; return (u && u.gain != null ? u.gain : 1) * db(LEVEL[id] || 0); }
+    function userGain(id) { var u = N.user[id], m = BYID[id]; if (u && u.on === false) return 0; if (!u && m && m.off) return 0; return (u && u.gain != null ? u.gain : 1) * db(LEVEL[id] || 0) * (id === 'wind' ? N.mix.wind : N.mix.nature); }
     N.userGain = userGain;
     // the one chain every sound goes through
     function chain(o) {

@@ -112,7 +112,7 @@
       h.dur = 2.4 + Math.hypot(h.to.x - h.from.x, h.to.z - h.from.z) / 7; h.perch = best; h.state = 'fly'; h.t = 0;
       h.wings.forEach(function (w) { w.visible = true; });
       world.splash(h.from.x, h.from.z, 1.2);
-      events.push({ type: 'heron', first: !h.startled++ });
+      events.push({ type: 'heron', first: !h.startled++ }); snd('heron', h.from.x, h.from.z);
     }
 
     // ---------------- turtles on the log at the pond's edge
@@ -134,7 +134,7 @@
         var d = Math.hypot(tu.home.x - k.x, tu.home.z - k.z); tu.t += dt;
         if (tu.state === 'bask') {
           tu.g.visible = true; tu.g.position.set(tu.home.x, tu.home.y, tu.home.z); tu.head.position.z = 0.15 + 0.02 * Math.sin(t * 0.7 + idx);
-          if (d < 3.0 + idx * 0.4) { tu.state = 'plop'; tu.t = 0; if (!turtleTold) { turtleTold = true; events.push({ type: 'turtles' }); } }
+          if (d < 3.0 + idx * 0.4) { tu.state = 'plop'; tu.t = 0; snd('plop', tu.home.x, tu.home.z, { when: 0.35 + idx * 0.2 }); if (!turtleTold) { turtleTold = true; events.push({ type: 'turtles' }); } }
         } else if (tu.state === 'plop') {
           var u = clamp(tu.t / 0.45, 0, 1), fw = Math.sin(tu.home.yaw), fz = Math.cos(tu.home.yaw);
           tu.g.position.set(tu.home.x + fw * 0.3 * u, tu.home.y - 0.35 * u * u, tu.home.z + fz * 0.3 * u); tu.g.rotation.x = 0.6 * u;
@@ -200,7 +200,7 @@
         var d = Math.hypot(f.home.x - k.x, f.home.z - k.z); f.t += dt;
         if (f.state === 'sit') {
           f.g.visible = true; f.g.position.set(f.home.x, f.home.y + 0.004 * Math.sin(t * 9 + f.home.x), f.home.z);
-          if (d < 1.9) { f.state = 'hop'; f.t = 0; f.to = { x: f.home.x + Math.sin(f.yaw) * 0.9, z: f.home.z + Math.cos(f.yaw) * 0.9 }; f.g.rotation.y = f.yaw; if (!frogTold) { frogTold = true; events.push({ type: 'frog' }); } }
+          if (d < 1.9) { f.state = 'hop'; f.t = 0; f.to = { x: f.home.x + Math.sin(f.yaw) * 0.9, z: f.home.z + Math.cos(f.yaw) * 0.9 }; f.g.rotation.y = f.yaw; snd('plop', f.to.x, f.to.z, { when: 0.3, gain: 0.6 }); if (!frogTold) { frogTold = true; events.push({ type: 'frog' }); } }
         } else if (f.state === 'hop') {
           var u = clamp(f.t / 0.5, 0, 1), wl = waterAt(f.to.x, f.to.z);
           f.g.position.set(f.home.x + (f.to.x - f.home.x) * u, f.home.y + (wl - f.home.y) * u + 0.45 * Math.sin(Math.PI * u), f.home.z + (f.to.z - f.home.z) * u);
@@ -288,7 +288,7 @@
         if (dk > 36) { d.g.visible = false; return; }
         var wl = world.water(h.x, h.z); d.g.visible = wl != null; if (wl == null) return;
         var px = d.g.position.x, pz = d.g.position.z;
-        if (Math.hypot(px - k.x, pz - k.z) < 2.0) { if (!d.flee && !duckTold) { duckTold = true; events.push({ type: 'teal' }); } d.flee = 2.5; }
+        if (Math.hypot(px - k.x, pz - k.z) < 2.0) { if (!d.flee) snd('teal', px, pz); if (!d.flee && !duckTold) { duckTold = true; events.push({ type: 'teal' }); } d.flee = 2.5; }
         d.flee = Math.max(0, d.flee - dt);
         d.a += d.sp * dt * (d.flee > 0 ? 3 : 1) / Math.max(0.3, d.r);
         var x = h.x + Math.cos(d.a) * d.r, z = h.z + Math.sin(d.a) * d.r * (d.si === 0 ? 1.1 : 0.7);
@@ -412,7 +412,7 @@
       owl.g.rotation.y = Math.atan2(k.x - OWLAT.x, k.z - OWLAT.z) * 0.3 + Math.PI * 0.5;
       owl.lookT -= dt; if (owl.lookT <= 0) { owl.lookT = 2 + Math.random() * 4; owl.look = (Math.random() - 0.5) * 2.6; }
       owl.head.rotation.y += (owl.look - owl.head.rotation.y) * Math.min(1, dt * 3);
-      owl.hoot -= dt; if (owl.hoot <= 0 && d < 28) { owl.hoot = 9 + Math.random() * 12; events.push({ type: 'hoot', near: d }); }
+      owl.hoot -= dt; if (owl.hoot <= 0 && d < 28) { owl.hoot = 9 + Math.random() * 12; events.push({ type: 'hoot', near: d }); snd('owl', OWLAT.x, OWLAT.z); }
     }
     // ---------------- white-tailed deer at dusk and dawn, grazing in the meadow; they bound off when he comes near
     function deerMesh(sc) {
@@ -440,7 +440,7 @@
         if (d.away > 0) { d.away -= dt; if (d.away <= 0) { d.hx = HERD.x + (R() - 0.5) * 6; d.hz = HERD.z + (R() - 0.5) * 5; } d.g.visible = false; return; }
         d.g.visible = true;
         var dk = Math.hypot(d.hx - k.x, d.hz - k.z);
-        if (dk < 5.5 && !d.flee) { d.flee = 2.6; d.fx = (d.hx - k.x) / (dk || 1); d.fz = (d.hz - k.z) / (dk || 1); d.yaw = Math.atan2(d.fx, d.fz); if (!deerTold) { deerTold = true; events.push({ type: 'deer' }); } }
+        if (dk < 5.5 && !d.flee) { snd('deer', d.hx, d.hz); d.flee = 2.6; d.fx = (d.hx - k.x) / (dk || 1); d.fz = (d.hz - k.z) / (dk || 1); d.yaw = Math.atan2(d.fx, d.fz); if (!deerTold) { deerTold = true; events.push({ type: 'deer' }); } }
         if (d.flee > 0) {
           // bounding: a leap every half second, tail up and white
           d.flee -= dt; d.hx += d.fx * dt * 6.5; d.hz += d.fz * dt * 6.5;
@@ -484,6 +484,8 @@
       card.g.rotation.x = card.hopT > 0.4 && Math.sin(t * 5) > 0.7 ? 0.5 : 0;   // a peck
     }
 
+    // a sound, every time it happens, from where it happens (Nov 19: the game plays it with PKNature)
+    function snd(id, x, z, o) { var e = { type: 'snd', id: id, x: x, z: z }; if (o) for (var q in o) e[q] = o[q]; events.push(e); }
     // ================================================================ more of the valley's life (the upgrade pass, Nov 18)
     // ---------------- bats: at dusk they pour out of the cave under the bluff and away down the creek; at night a few hunt over the water near him
     var BATS = (function () {
@@ -544,7 +546,8 @@
       var a = dillo; if (!DILLOAT) return; var h = k.hour == null ? 12 : ((k.hour % 24) + 24) % 24, on = (h > 18.2 || h < 6.2) && !k.storm;
       a.g.visible = on && Math.hypot(a.x - k.x, a.z - k.z) < 60; if (!a.g.visible) { a.jump = -1; a.flee = 0; return; }
       var dk = Math.hypot(a.x - k.x, a.z - k.z), hop = 0, sp = 0.22, walk = true;
-      if (a.jump < 0 && a.flee <= 0 && dk < 2.5) { a.jump = 0; a.fx = (a.x - k.x) / (dk || 1); a.fz = (a.z - k.z) / (dk || 1); if (!a.told) { a.told = true; events.push({ type: 'armadillo' }); } }
+      a.rustT = (a.rustT || 2) - dt; if (a.rustT <= 0 && dk < 10 && a.jump < 0) { a.rustT = a.flee > 0 ? 0.9 : 2.5 + R() * 3; snd('armadillo', a.x, a.z); }   // rooting in the leaves, and scuttling off
+      if (a.jump < 0 && a.flee <= 0 && dk < 2.5) { snd('armadillo', a.x, a.z, { gain: 1.4 }); a.jump = 0; a.fx = (a.x - k.x) / (dk || 1); a.fz = (a.z - k.z) / (dk || 1); if (!a.told) { a.told = true; events.push({ type: 'armadillo' }); } }
       if (a.jump >= 0) {           // straight up, as armadillos do when startled
         a.jump += dt; var u = a.jump / 0.5; hop = Math.sin(Math.min(1, u) * Math.PI) * 0.6; walk = false;
         if (u >= 1) { a.jump = -1; a.flee = 2.8; a.yaw = Math.atan2(a.fx, a.fz); }
@@ -614,12 +617,12 @@
         b.wait = 9 + R() * 12;
         for (var tries = 0; tries < 8; tries++) {
           var a = R() * 6.28, rr = R() * 2.4, x = BASSAT.x + Math.cos(a) * rr, z = BASSAT.z + Math.sin(a) * rr, yaw = R() * 6.28, wl = world.water(x, z), wl2 = world.water(x + Math.sin(yaw) * 1.1, z + Math.cos(yaw) * 1.1);
-          if (wl != null && wl2 != null && wl - world.height(x, z) > 0.25) { b.x = x; b.z = z; b.yaw = yaw; b.wl = wl; b.t = 0; world.splash(x, z, 1.1); events.push({ type: 'bassJump', near: dk, first: !b.told && dk < 12 }); if (dk < 12) b.told = true; break; }
+          if (wl != null && wl2 != null && wl - world.height(x, z) > 0.25) { b.x = x; b.z = z; b.yaw = yaw; b.wl = wl; b.t = 0; world.splash(x, z, 1.1); snd('splash', x, z); events.push({ type: 'bassJump', near: dk, first: !b.told && dk < 12 }); if (dk < 12) b.told = true; break; }
         }
         return;
       }
       b.t += dt; var u = b.t / 0.85;
-      if (u >= 1) { b.t = -1; b.g.visible = false; world.splash(b.x + Math.sin(b.yaw) * 1.1, b.z + Math.cos(b.yaw) * 1.1, 1.5); events.push({ type: 'bassPlop', near: dk }); return; }
+      if (u >= 1) { b.t = -1; b.g.visible = false; world.splash(b.x + Math.sin(b.yaw) * 1.1, b.z + Math.cos(b.yaw) * 1.1, 1.5); snd('splash', b.x + Math.sin(b.yaw) * 1.1, b.z + Math.cos(b.yaw) * 1.1, { gain: 0.7 }); events.push({ type: 'bassPlop', near: dk }); return; }
       b.g.visible = true;
       b.g.position.set(b.x + Math.sin(b.yaw) * 1.1 * u, b.wl - 0.1 + Math.sin(u * Math.PI) * 0.62, b.z + Math.cos(b.yaw) * 1.1 * u);
       b.g.rotation.set(-1.15 * Math.cos(u * Math.PI), b.yaw, 0.5 * Math.sin(u * 9), 'YXZ');
